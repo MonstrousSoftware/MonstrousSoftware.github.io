@@ -1,6 +1,6 @@
 ## Dev Log ‘War of The Pixels’
 
-This game was developed for the LibGDX game jam in March 2023 with as theme ‘pixel wars’.
+This game was developed for the LibGDX game jam in March 2023 with as theme ‘pixel wars’. You can see the playthrough [here][1] (starting from 1:22)
 
 ![wotp](https://user-images.githubusercontent.com/49096535/230102813-61f142fe-dfa5-41d9-9565-cb0f7453378a.png)
 
