@@ -1,5 +1,3 @@
-Here you can say lots of fun things about your site.
+This is a blog about game coding.
 
-Maybe say a some things about yourself.
-
-Or maybe what you plan to blog about.
+Mainly using Java and LibGDX.
