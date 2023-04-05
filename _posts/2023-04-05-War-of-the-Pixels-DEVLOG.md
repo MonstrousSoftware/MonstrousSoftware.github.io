@@ -86,7 +86,10 @@ One thing to look out for when using ParticleSystem is that it doesn’t stop an
 First the particle effect had a “blocky” look to it, because the blending was incorrect.  I used the constructor of the PointSpriteParticleBatch to define a better BlendingAttribute `(src_color, 1-src_alpha)` which seems to work.
 
 
-
+### For further improvement
+* Tanks should follow the terrain more accurately, adjusting to the local normal vector from the terrain mesh.
+* Trees and stones are classical examples where you could use 'instanced rendering'. Some grass would be nice too.  This would be interesting to add.
+* On the web version, there is quite a delay from pressing the 'NEW CAMPAIGN' button to any response.  Probably this delay is caused by asset loading and terrain generation. It would be nice to have some loading bar to show something is happening, or instead to load this earlier.
 
 
 [1]: https://www.youtube.com/watch?v=em0cy5iPmpg&t=5548s&ab_channel=Raeleus "libGDX Jam March 2023 Review"
