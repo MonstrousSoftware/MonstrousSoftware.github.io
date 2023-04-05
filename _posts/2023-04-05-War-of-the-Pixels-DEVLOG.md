@@ -2,6 +2,10 @@
 
 This game was developed for the LibGDX game jam in March 2023 with as theme ‘pixel wars’.
 
+![wotp](https://user-images.githubusercontent.com/49096535/230102813-61f142fe-dfa5-41d9-9565-cb0f7453378a.png)
+
+
+
 It is a very simplified version of a real-time strategy game. The airships were clearly inspired by the Kirovs from Red Alert.
 
 Originally there was going to be a clearer link to the theme of pixel wars, by using the amount of occupied territory to determine how much money you could make.  The minimap was supposed to show squares (“pixels”) occupied by red or by blue.  Moving the flag would allow you to capture more land, but at a risk of endangering the flag.  The money you made could be used to by more units.
@@ -13,13 +17,16 @@ It goes without saying that all this had to be cut in the interest of finishing 
 The models were created in Blender. What helped with the work flow is to have all the models in the same blender file, all at the origin. 
 
 
-All assets at the same position
+![wotp1](https://user-images.githubusercontent.com/49096535/230103288-60aff8b8-4017-42af-9854-7e819f1140e6.png)
+
+> All assets at the same position
 
 
 In Blender you can hide the models you are not working on.  Then to export as FBX file, just select the whole collection, use scale 0.01 and export the meshes.  The fbx-convert tool converts it to a single g3db file which is loaded by the game.   In LibGDX terminology the different units are nodes of the same model. They are loaded using:
 
+```java 
 ModelInstance modelInstance = new ModelInstance(model, "Tank");
-
+```
 
 where “Tank” is the node name and the name given to the object in Blender.
 
@@ -49,7 +56,7 @@ The terrain is a simple heightfield based off an image file of Perlin noise.  I 
 
 I used a low, low resolution texture on the terrain, to remain in the pixel theme. 
 
-I wanted to experiment with some vegetation and props on the terrain, so I randomly place a few hundred trees and stones. For some reason, I modelled three different stones but only a single tree. Yes, they are supposed to be stones, not rabbit poos [1].
+I wanted to experiment with some vegetation and props on the terrain, so I randomly place a few hundred trees and stones. For some reason, I modelled three different stones but only a single tree. Yes, they are supposed to be stones, not [rabbit poos][1].
 
 This many model instances really slowed down the HTML version, until I put the terrain and all the scenery in a ModelCache to reduce the number of draw calls to the GPU.  This had the added benefit that the trees and stones are no longer needed in the gameObjects array and therefore invisible to collision detection.  Where we iterate to update all the game objects, we don’t have to waste processing cycles on bits of scenery.
 
@@ -62,9 +69,9 @@ A flaw in the AI is that it doesn’t recognize that once an airship has dropped
 
 ### Voice responses
 
-The voice responses were generated with an free online robot voice generator.
+The voice responses were generated with an free online [robot voice generator][2].
 
-https://lingojam.com/RobotVoiceGenerator
+> 
 
 Some online sites had more realistic voices, but, alas, the ones I checked were not free.
 
@@ -76,11 +83,11 @@ A 3d particle effect was added for fire and smoke when a unit or structure gets 
 
 One thing to look out for when using ParticleSystem is that it doesn’t stop and dispose particle effects once they have finished.  My update code checks for effects.isComplete() and then disposes it and removes it from the particle system. 
 
-First the particle effect had a “blocky” look to it, because the blending was incorrect.  I used the constructor of the PointSpriteParticleBatch to define a better BlendingAttribute (src_color, 1 - src_alpha) which seems to work.
-PointSpriteParticleBatch  pointSpriteBatch = 
+First the particle effect had a “blocky” look to it, because the blending was incorrect.  I used the constructor of the PointSpriteParticleBatch to define a better BlendingAttribute `(src_color, 1-src_alpha)` which seems to work.
 
 
 
 
-### References
-[1] libGDX Jam March 2023 Review
+
+[1]: https://www.youtube.com/watch?v=em0cy5iPmpg&t=5548s&ab_channel=Raeleus "libGDX Jam March 2023 Review"
+[2]: https://lingojam.com/RobotVoiceGenerator "online robot voice generator"
