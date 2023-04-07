@@ -26,4 +26,4 @@ If you are desperate to get instanced rendering working on web pages, you could 
 
 
 [1]: https://github.com/libgdx/libgdx/blob/master/tests/gdx-tests/src/com/badlogic/gdx/tests/gles3/InstancedRenderingTest.java "InstancedRenderingTest.java"
-[2]: https://github.com/libgdx/libgdx/pull/5763 "pull request to add WebGL 2.0"
+[2]: https://github.com/libgdx/libgdx/pull/7037 "pull request to add WebGL 2.0"
