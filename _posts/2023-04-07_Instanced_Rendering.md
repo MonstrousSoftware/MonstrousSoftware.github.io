@@ -16,7 +16,7 @@ However, the HTML/GWT platform is only running WebGL 1.0 which is roughly equiva
 
 Since HTML this is the target platform for this game, I will leave this for a future project.
 
-If you are desperate to get instanced rendering working on web pages, you could have a look at the proposed [update][2] of LibGDX to include Web GL 2.0, which is roughly equivalent to GL ES 3.0. No idea, when this will be included in mainstream LibGDX.
+If you are desperate to get instanced rendering working on web pages, you could have a look at the proposed [update][2] of LibGDX to include Web GL 2.0, which is roughly equivalent to GL ES 3.0. No idea when this will be included in mainstream LibGDX. Remember this is all based on volunteer work.
 
 
 
