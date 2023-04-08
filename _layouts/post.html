@@ -24,9 +24,8 @@ layout: default
   <div class="post-content e-content" itemprop="articleBody">
     {{ content }}
     {% include navlinks.html %}
-  </div>
-  
-  <script src="https://utteranc.es/client.js"
+    
+      <script src="https://utteranc.es/client.js"
         repo="MonstrousSoftware/MonstrousSoftware.github.io"
         issue-term="pathname"
         label="Comment"
@@ -34,6 +33,9 @@ layout: default
         crossorigin="anonymous"
         async>
 </script>
+  </div>
+  
+
 
 
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
