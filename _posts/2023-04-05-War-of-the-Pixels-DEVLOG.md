@@ -96,11 +96,3 @@ First the particle effect had a “blocky” look to it, because the blending wa
 [2]: https://lingojam.com/RobotVoiceGenerator "online robot voice generator"
 
 
-<script src="https://utteranc.es/client.js"
-        repo="MonstrousSoftware / MonstrousSoftware.github.io"
-        issue-term="pathname"
-        label="Comment"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>
