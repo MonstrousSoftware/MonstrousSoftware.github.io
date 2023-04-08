@@ -94,3 +94,13 @@ First the particle effect had a “blocky” look to it, because the blending wa
 
 [1]: https://www.youtube.com/watch?v=em0cy5iPmpg&t=5548s&ab_channel=Raeleus "libGDX Jam March 2023 Review"
 [2]: https://lingojam.com/RobotVoiceGenerator "online robot voice generator"
+
+
+<script src="https://utteranc.es/client.js"
+        repo="MonstrousSoftware / MonstrousSoftware.github.io"
+        issue-term="pathname"
+        label="Comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
