@@ -47,6 +47,7 @@ For example let's put the camera on the diagonal X=Z, in other words we will use
 
 
 
+
 ```java
 	cam = new OrthographicCamera();
 	cam.position.set(10f, 10f, 10f);
@@ -55,6 +56,11 @@ For example let's put the camera on the diagonal X=Z, in other words we will use
 	cam.far = 30f;
 	cam.update();
 ```
+
+The following picture shows the viewing frustum of the orthographic camera in this scene. What is inside the box of black lines, will be shown on the screen. The square at the top right is the near clipping plane and the square at the bottom right is the far clipping plane.
+
+![image](https://user-images.githubusercontent.com/49096535/231235906-a35c3f22-0016-44a3-bf3d-488c22c18704.png)
+> Projection frustum of the orthographic camera at (10,10,10) pointing at the origin
 
 ![image](https://user-images.githubusercontent.com/49096535/231210875-06458831-2074-41a5-847e-8f5f2f1bd0b7.png)
 > Isometric view
