@@ -58,7 +58,7 @@ A better approach for a 3d game is to use decals.   These are textures that have
     }
 ```
 
-Note how we don't point the decals directly at the camera (i.e. don't use `decal.lookAt(camera.position, camera.up);` as recommended by the LibGDX documentation.)
+Note how we don't point the decals directly at the camera (i.e. we don't use `decal.lookAt(camera.position, camera.up)` as recommended by the LibGDX documentation.)
 We get a better effect by pointing the decal towards the camera's near plane. Or in other words, to have the normal vector of the decal in the opposite direction as the camera's view vector.
 All the decals are oriented in the same direction.
 
