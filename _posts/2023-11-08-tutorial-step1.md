@@ -18,7 +18,7 @@ To view or edit the 3d models, you can use Blender which is free to download fro
 
 To build the initial framework of our project we'll use the tool `gdx-liftoff`.  This is a replacement for the classic `gdx-setup` tool.
 
-Download the latest version of gdx-liftoff from here: [https://github.com/tommyettinger/gdx-liftoff/releases](https://github.com/tommyettinger/gdx-liftoff/releases).
+Download the latest version of [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff/releases).
 It comes in the form of a jar file with a name like gdx-liftoff-<version>.jar.
 
 Double-click on the jar file. If nothing happens, go to the command line and type: `java -jar gdx-liftoff-1.12.03.jar` (substitute the version you downloaded).
