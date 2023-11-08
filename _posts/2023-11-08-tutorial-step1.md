@@ -244,7 +244,7 @@ Probably you want the demo to fill the browser screen, so change the config widt
         config.height = 0;
         config.antialiasing = true;
 
-![step1browser.png](../images/step1browser.png)
+![step1browser.png](/_posts/images/step1browser.png)
 
 
 ## Conclusions
