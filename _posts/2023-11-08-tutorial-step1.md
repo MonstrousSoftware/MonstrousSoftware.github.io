@@ -1,6 +1,8 @@
 # Tutorial on creating a 3D game with LibGDX
 by Monstrous Software
 
+# Step 1 - Basic setup
+
 ## Introduction
 In this tutorial series we are going to build a basic first person shooter using LibGDX.
 
