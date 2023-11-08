@@ -221,7 +221,7 @@ You can use the mouse to change the view (hold down left or right mouse button) 
 You can use the mouse wheel to zoom.
 
 
-![step1.png](https://github.com/MonstrousSoftware/MonstrousSoftware.github.io/blob/main/_posts/images/step1.png)
+![step1.png](/images/step1.png)
 
 
 ## Desktop launcher
