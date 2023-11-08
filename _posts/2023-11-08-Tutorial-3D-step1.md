@@ -12,9 +12,9 @@ We'll load 3d assets using the GLTF file format and we'll see how we can export 
 
 
 ## Prerequisites
-You'll need an IDE (integrated development environment). I would recommend IntelliJ IDEA. The community version is free and is more than sufficient for this project.
+You'll need an IDE (integrated development environment). I would recommend [IntelliJ IDEA](https://www.jetbrains.com/idea/). The community version is free and is more than sufficient for this project.
 
-To view or edit the 3d models, you can use Blender which is free to download from [Blender.org](https://blender.org).
+To create, view or edit the 3d models, you can use [Blender](https://blender.org) which is free to download.
 
 ## Lift off
 
