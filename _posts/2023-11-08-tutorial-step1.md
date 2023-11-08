@@ -1,4 +1,4 @@
-# Tutorial on creating a 3D game with LibGDX
+# Tutorial on creating a 3D game with LibGDX (step 1)
 by Monstrous Software
 
 # Step 1 - Basic setup
