@@ -1,4 +1,4 @@
-# Tutorial on creating a 3D game with LibGDX
+# 3D Tutorial - Step 5 - Physics and collisions
 by Monstrous Software
 
 

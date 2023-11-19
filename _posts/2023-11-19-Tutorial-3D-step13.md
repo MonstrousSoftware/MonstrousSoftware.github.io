@@ -1,4 +1,4 @@
-# Tutorial on creating a 3D game with LibGDX
+# 3D Tutorial - Step 13 - Gun
 by Monstrous Software
 
 
