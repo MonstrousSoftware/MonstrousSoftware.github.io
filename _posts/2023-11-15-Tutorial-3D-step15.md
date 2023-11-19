@@ -115,8 +115,8 @@ ODE allows to define a shape for the distribution of mass, which can give a more
 (To be fair, the difference is rather subtle, and this change is entirely optional).
 For example, for a spherical mass we use `massInfo.setSphere(1, radius)` where 1 is arbitrarily used as mass density.  
 If we assume all game objects have the same mass density, we can let the 
-mass be automatically calculated from the shape and its size.  This automatically means that larger objects will be heavier than smaller ones. It also means
-we no longer have to define a mass for every object we create.  Note that we will need to tweak the force values as this changes the mass of the various objects.
+mass be automatically calculated from the shape and its size.  This means that larger objects will be heavier than smaller ones.
+We now no longer have to define a mass for every object we create.  Note that we will need to tweak the force values as this changes the mass of the various objects.
 
 Here is the new version of `createBody` using mass derived from the shape and the offset rotation we discussed earlier:
 

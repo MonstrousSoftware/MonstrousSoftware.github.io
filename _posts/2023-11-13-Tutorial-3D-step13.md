@@ -284,7 +284,10 @@ To add the animation, add the following code to `GameScreen.render()`:
 ```
 You should now hear a sound effect and see the animation when you fire the gun.
 
-Of course, you can't hit anything yet.  For this we will use ray casting.
+Of course, you can't hit anything yet.  For this we will use ray casting again.  We already had a ray defined to test contact with a ground surface, we now add a ray ("shootRay") to test if the gun will hit anything.
+We create a new class `HitPoint` to hold the details of a contact between the shootRay and an object that is shot. This can be used to apply an impact on the shot object and for example to do special effects.
+
+
 ```java
     public class PhysicsRayCaster implements Disposable {
     
@@ -390,7 +393,8 @@ This hit point is passed as an additional parameter to `world.fireWeapon()` to p
         }
 ```
 
-The `fireWeapon()` method in the World class now needs updating to use this extra hit point parameter:
+The `fireWeapon()` method in the World class now needs updating to use this extra hit point parameter. We can calculate an impulse and apply it to the object that was shot.  This will make small 
+objects shoot away and larger objects will be pushed back:
 ```java
         private final Vector3 impulse = new Vector3();
     
@@ -422,8 +426,8 @@ The `fireWeapon()` method in the World class now needs updating to use this extr
                 }
             }
 ```
-We need an additional method in PhysicsBody to apply a force with an offset instead of applying the force at centre mass.  This means there will
-be a difference where you shoot something.   The method is very similar to `applyForce()`.
+We need an additional method in PhysicsBody to apply a force with an offset instead of applying the force at centre mass.  This means the impact depends on where the object was hit.
+The method is very similar to `applyForce()`.
 
 ```java
         public void applyForce( Vector3 force ){
