@@ -48,6 +48,8 @@ Web versions are great for game jams or to reach a large audience, because peopl
 The web versions have some limitations though, so for this tutorial we'll mainly focus on the desktop version. 
 
 ![lift-off screen shot](images/liftoff-1.png)
+![lift-off screen shot](/assets/images/liftoff-1.png)
+![lift-off screen shot](/MonstrousSoftware.github.io/assets/images/liftoff-1.png)
 
 Don't click on the 'Generate Project' button yet, but navigate to the tab 'Extensions'.
 Select 'Controllers' for controller support.
