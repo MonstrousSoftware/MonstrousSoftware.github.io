@@ -1,4 +1,4 @@
-# 3D Tutorial - Step 2
+# 3D Tutorial - Step 3 - GLTF support
 by Monstrous Software
 
 
