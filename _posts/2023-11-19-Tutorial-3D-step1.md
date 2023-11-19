@@ -1,27 +1,34 @@
-# Tutorial on creating a 3D game with LibGDX (step 1)
+# Tutorial on creating a 3D game with LibGDX
 by Monstrous Software
 
-# Step 1 - Basic setup
-
 ## Introduction
-In this tutorial series we are going to build a basic first person shooter using LibGDX.
+In this tutorial series we are going to build a basic first-person shooter using LibGDX.
 
 This will be a 3d single player game. 
-We will be targeting the desktop version and a web version.
-We'll load 3d assets using the GLTF file format and we'll see how we can export assets from modeling software such as Blender.
+We will be targeting the desktop version and a web version using the gdx-teavm extension.
+We'll load 3d assets using the GLTF file format, and we'll see how we can export assets from modeling software such as Blender.
+We will add physics using the gdx-ode4j extension.
+
+This will not be a polished game, you can try it out on [itch.io](https://monstrous-software.itch.io/fps-demo) now if you want.
+The idea is to show how you can develop a 3d game using LibGDX and some of the popular extensions.
+
+The development is shown as a number of steps, where every step we add something new (and sometimes we remove something old).
+There is a [github repository](https://github.com/MonstrousSoftware/Tut3D) which provides all the code corresponding to this tutorial and every step of this 
+tutorial is provided as a git tag.  Using the tags you can step through the history of the code. Each step results in 
+a runnable version of the app.
 
 
 ## Prerequisites
-You'll need an IDE (integrated development environment). I would recommend [IntelliJ IDEA](https://www.jetbrains.com/idea/). The community version is free and is more than sufficient for this project.
+You'll need an IDE (integrated development environment). I would recommend IntelliJ IDEA. The community version is free and is more than sufficient for this project.
 
-To create, view or edit the 3d models, you can use [Blender](https://blender.org) which is free to download.
+To view or edit the 3d models, you can use Blender which is free to download from [Blender.org](https://blender.org).
 
-## Lift off
+## Step 1 - Lift off
 
 To build the initial framework of our project we'll use the tool `gdx-liftoff`.  This is a replacement for the classic `gdx-setup` tool.
 
-Download the latest version of [gdx-liftoff](https://github.com/tommyettinger/gdx-liftoff/releases).
-It comes in the form of a jar file with a name like `gdx-liftoff-<version>.jar`.
+Download the latest version of gdx-liftoff from here: [https://github.com/tommyettinger/gdx-liftoff/releases](https://github.com/tommyettinger/gdx-liftoff/releases).
+It comes in the form of a jar file with a name like gdx-liftoff-<version>.jar.
 
 Double-click on the jar file. If nothing happens, go to the command line and type: `java -jar gdx-liftoff-1.12.03.jar` (substitute the version you downloaded).
 
@@ -40,7 +47,7 @@ These both generate an HTML version, but they use different underlying technolog
 Web versions are great for game jams or to reach a large audience, because people can play your game without having to download files. 
 The web versions have some limitations though, so for this tutorial we'll mainly focus on the desktop version. 
 
-![lift-off screen shot](https://monstroussoftware.github.io/images/liftoff-1.png)
+![lift-off screen shot](images/liftoff-1.png)
 
 Don't click on the 'Generate Project' button yet, but navigate to the tab 'Extensions'.
 Select 'Controllers' for controller support.
@@ -55,7 +62,7 @@ Select 'Add GUI assets' in case we'll need some GUI elements and 'Add README'.
 
 Press the button 'Generate Project'. The tool will now create a project directory which should look as follows:
 
-![empty project](https://monstroussoftware.github.io/images/project-empty.png)
+![](images/project-empty.png)
 
 Double-click on build.gradle. Or alternatively, open IntelliJ IDEA and use File/Open to open build.gradle.
 If IntelliJ asks to open build.gradle as file or as project, answer 'as project'.
@@ -222,8 +229,8 @@ If you're not sure what needs to be disposed, check if the object class has a di
 For example, you need to dispose each Model, but not a ModelInstance. 
 You need to dispose ModelBatch, but not the PerspectiveCamera.
 
- ```java
-       @Override
+```java
+        @Override
         public void hide() {
             dispose();
         }
@@ -247,7 +254,7 @@ You can use the mouse to change the view (hold down left or right mouse button) 
 You can use the mouse wheel to zoom.
 
 
-![step1.png](https://monstroussoftware.github.io/images/step1.png)
+![step1.png](images%2Fstep1.png)
 
 
 ## Desktop launcher
@@ -274,8 +281,31 @@ Probably you want the demo to fill the browser screen, so change the config widt
         config.antialiasing = true;
 ```
 
-![step1browser.png](https://monstroussoftware.github.io/images/step1browser.png)
+![step1browser.png](images%2Fstep1browser.png)
 
+Later on we will add some code to capture the mouse cursor and to make sure the function keys are available to out game.  For this we need an updated version of gdx-teavm.  Locate the file `gradle.properties` in the root
+of our project.  This file provides version numbers for the different libraries we make use of. Change the line for gdxTeaVMVersion to at least 1.0.0-b8.  
+When you recompile, gradle will automatically download the requested version of the library.
+
+
+        org.gradle.daemon=true
+        org.gradle.jvmargs=-Xms512M -Xmx1G
+        org.gradle.configureondemand=false
+        gdxControllersVersion=2.2.1
+        controllerMappingVersion=2.3.0
+        controllerScene2DVersion=2.3.0
+        gdxGltfVersion=2.1.0
+        gdxTeaVMVersion=1.0.0-b8             <-------
+        gdxVersion=1.12.1
+
+If your previous version was 1.0.0-b6 you may get a compile error on `TeaVMBuilder.java`.  This can be fixed by changing two import statements by adding the word `config` in each and commenting out
+the import of `TeaReflectionSupplier`:
+
+```
+    import com.github.xpenatan.gdx.backends.teavm.config.TeaBuildConfiguration;
+    import com.github.xpenatan.gdx.backends.teavm.config.TeaBuilder;
+    //import com.github.xpenatan.gdx.backends.teavm.plugins.TeaReflectionSupplier;
+```
 
 ## Conclusions
 
