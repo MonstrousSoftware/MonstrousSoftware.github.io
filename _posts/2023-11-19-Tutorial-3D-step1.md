@@ -47,10 +47,8 @@ These both generate an HTML version, but they use different underlying technolog
 Web versions are great for game jams or to reach a large audience, because people can play your game without having to download files. 
 The web versions have some limitations though, so for this tutorial we'll mainly focus on the desktop version. 
 
-![lift-off screen shot](images/liftoff-1.png)
 ![lift-off screen shot](/assets/images/liftoff-1.png)
-![lift-off screen shot](/MonstrousSoftware.github.io/assets/images/liftoff-1.png)
-![lift-off screen shot](liftoff-1.png)
+
 
 Don't click on the 'Generate Project' button yet, but navigate to the tab 'Extensions'.
 Select 'Controllers' for controller support.
@@ -65,7 +63,7 @@ Select 'Add GUI assets' in case we'll need some GUI elements and 'Add README'.
 
 Press the button 'Generate Project'. The tool will now create a project directory which should look as follows:
 
-![](images/project-empty.png)
+![initial project directory](/assets/images/project-empty.png)
 
 Double-click on build.gradle. Or alternatively, open IntelliJ IDEA and use File/Open to open build.gradle.
 If IntelliJ asks to open build.gradle as file or as project, answer 'as project'.
@@ -257,7 +255,7 @@ You can use the mouse to change the view (hold down left or right mouse button) 
 You can use the mouse wheel to zoom.
 
 
-![step1.png](images%2Fstep1.png)
+![step1.png](/assets/images/step1.png)
 
 
 ## Desktop launcher
@@ -284,7 +282,7 @@ Probably you want the demo to fill the browser screen, so change the config widt
         config.antialiasing = true;
 ```
 
-![step1browser.png](images%2Fstep1browser.png)
+![step1 in a browser](/assets/images/step1browser.png)
 
 Later on we will add some code to capture the mouse cursor and to make sure the function keys are available to out game.  For this we need an updated version of gdx-teavm.  Locate the file `gradle.properties` in the root
 of our project.  This file provides version numbers for the different libraries we make use of. Change the line for gdxTeaVMVersion to at least 1.0.0-b8.  
