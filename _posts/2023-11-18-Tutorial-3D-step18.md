@@ -44,3 +44,6 @@ GameScreen:
 
 
 This concludes step 18.
+
+This concludes the tutorial, although there are a lot of things to improve and to polish on the game, the principles of coding a basic 3d game should now hopefully be clear.
+Thank you for reading up to here and if you intend to apply some of these lessons I wish you the best of luck.
