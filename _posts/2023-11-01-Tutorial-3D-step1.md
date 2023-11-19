@@ -20,7 +20,7 @@ a runnable version of the app.
 ## Index
 - [step 1: project setup, gdx-liftoff, 3d scene](https://monstroussoftware.github.io/2023/11/01/Tutorial-3D-step1.html)
 - [step 2: FPS camera controller](https://monstroussoftware.github.io/2023/11/02/Tutorial-3D-step2.html)
-- [step 3: gdx-gltf, importing from Blender](https://monstroussoftware.github.io/2023/11/02/Tutorial-3D-step3.html)
+- [step 3: gdx-gltf, importing from Blender](https://monstroussoftware.github.io/2023/11/03/Tutorial-3D-step3.html)
 - [step 4: multiple objects, grid view](https://monstroussoftware.github.io/2023/11/04/Tutorial-3D-step4.html)
 - [step 5: physics, collisions, rigid bodies](https://monstroussoftware.github.io/2023/11/05/Tutorial-3D-step5.html)
 - [step 6: spawning bullets, debug view, player/camera controller](https://monstroussoftware.github.io/2023/11/06/Tutorial-3D-step6.html)
