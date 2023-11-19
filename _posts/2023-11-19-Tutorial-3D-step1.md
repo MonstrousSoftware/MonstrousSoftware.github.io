@@ -17,6 +17,26 @@ There is a [github repository](https://github.com/MonstrousSoftware/Tut3D) which
 tutorial is provided as a git tag.  Using the tags you can step through the history of the code. Each step results in 
 a runnable version of the app.
 
+## Index
+- [step 1: project setup, gdx-liftoff, 3d scene](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step1.html)
+- [step 2: FPS camera controller](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step2.htmld)
+- [step 3: gdx-gltf, importing from Blender](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step3.html)
+- [step 4: multiple objects, grid view](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step4.html)
+- [step 5: physics, collisions, rigid bodies](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step5.html)
+- [step 6: spawning bullets, debug view, player/camera controller](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step6.html)
+- [step 7: mesh collision shapes, collision proxy objects](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step7.html)
+- [step 8: ray casting, ground collision](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step8.html)
+- [step 9: game object types, pickups](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step9.html)
+- [step 10: enemy characters, bullets, health](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step10.html)
+- [step 11: asset manager, sounds](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step11.html)
+- [step 12: GUI](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step12.html)
+- [step 13: gun](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step13.html)
+- [step 14: scope view](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step14.html)
+- [step 15: unified reference frame](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step15.html)
+- [step 16: game controller support](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step16.html)
+- [step 17: head bobbing](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step17.html)
+- [step 18: full screen mode](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step18.html)
+
 
 ## Prerequisites
 You'll need an IDE (integrated development environment). I would recommend IntelliJ IDEA. The community version is free and is more than sufficient for this project.
