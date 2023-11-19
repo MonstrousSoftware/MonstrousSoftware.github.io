@@ -78,7 +78,7 @@ This will rename the source file, the name of the class file and also the refere
 
 In the GameScreen class, let's add some fields: a camera, a camera controller, an environment, a model, a texture, an array of ModelInstance and a ModelBatch.
 
-~~~java
+```java
     private PerspectiveCamera cam;
     private CameraInputController camController;
     private Environment environment;
@@ -86,7 +86,7 @@ In the GameScreen class, let's add some fields: a camera, a camera controller, a
     private Texture textureGround;
     private Array<ModelInstance> instances;
     private ModelBatch modelBatch;
-~~~
+```
 
 In the show method we'll start with defining a perspective camera.  It is this camera that gives us a 3d view of the world.
 The first parameter is the viewing angle, you can choose a different value if you want more of a fish eye view. 
