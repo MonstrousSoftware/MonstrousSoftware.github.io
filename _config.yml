@@ -15,6 +15,9 @@ description: "Blog about game coding." # This will show up in places like twitte
 #youtube_username: username
 #googleplus_username: +username
 
+
+
+
 #########################################################################################
 ######### Nothing below needs to be changed (unless you know what you're doing) #########
 #########################################################################################
@@ -23,6 +26,8 @@ theme: "minima"
 rss: rss
 
 highlighter: rouge
+
+markdown: kramdown
 
 kramdown:
   syntax_highlighter: rouge
