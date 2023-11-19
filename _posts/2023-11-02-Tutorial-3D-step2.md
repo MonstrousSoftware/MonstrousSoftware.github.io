@@ -138,7 +138,10 @@ For the moveForward() method, we add a temporary Vector3 variable to hold the mo
 It is set to the camera's direction.  This is the vector indicating in three dimensions where 
 the camera is pointing. Then we zero the Y component to project the vector onto the horizontal plane. 
 
-> In LibGDX the convention is that the Y-axis points upwards, but this is not a standard convention everywhere.  For example, in Blender, Z is the up axis.  Also in the physics library ODE4j which we will use later, Z points upwards.    
+> In LibGDX the convention is that the Y-axis points upwards, 
+> but this is not a standard convention everywhere.  
+> For example, in Blender, Z is the up axis.  
+> Also in the physics library ODE4j, which we will use later, we will use Z to point upwards.    
  
 Then we normalize it to make it a unit length again and scale it with the distance we want to move in this update step.  
 Finally, we add this vector to the camera position to move it forward (or backwards if direction has a negative value).
