@@ -50,6 +50,7 @@ The web versions have some limitations though, so for this tutorial we'll mainly
 ![lift-off screen shot](images/liftoff-1.png)
 ![lift-off screen shot](/assets/images/liftoff-1.png)
 ![lift-off screen shot](/MonstrousSoftware.github.io/assets/images/liftoff-1.png)
+![lift-off screen shot](liftoff-1.png)
 
 Don't click on the 'Generate Project' button yet, but navigate to the tab 'Extensions'.
 Select 'Controllers' for controller support.
