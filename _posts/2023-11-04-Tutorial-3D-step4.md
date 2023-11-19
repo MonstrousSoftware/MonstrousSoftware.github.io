@@ -10,7 +10,7 @@ Let us add some more items to the GLTF file and see how we can handle multiple o
 
 The file step4a.gtlf contains a few more objects.  You can see the file in Blender in the following picture.
 
-![blender-step4a.png](images/blender-step4a.png)
+![blender-step4a.png](/assets/images/blender-step4a.png)
 
 We see a number of blocks have been added, a wall, a red ball and a character.
 
@@ -25,7 +25,7 @@ with the following:
 
 We can see all the objects in the file are rendered on screen, and we can walk around them (or indeed through them, because we don't have any collision detection so far).
 
-![](images/screenshot-4a.png)
+![screen shot](/assets/images/screenshot-4a.png)
 
 
 If we want understand a bit more about the content of the file we just loaded, we can print some debug statements. 
@@ -280,7 +280,7 @@ Here, for example, we spawn three ball object above each other: at (0,0,0), at (
 
 The Populator class does nothing but create objects in the world.  You can imagine this could be extended to read this data from an external file and then you could perhaps provide different files for different levels in your game.  For simplicity, we'll just use these hardcoded definitions for now.
 
-![](images/screenshot-4a2.png)
+![](/assets/images/screenshot-4a2.png)
 
 
 In GameScreen we create a private World object. We also create a private GameView object which is passed the World object in its constructor:
@@ -364,7 +364,7 @@ Then in the GameScreen constructor create a GridView object, dispose of it in th
 ```
 This shows a reference grid and shows us the orientation of the world coordinate system (red, green, blue is X, Y, Z respectively).
 
-![](images/screenshot-4a3.png)
+![](/assets/images/screenshot-4a3.png)
 
 ## Shadows
 
@@ -389,7 +389,7 @@ The shadow quality often requires some tweaking of the parameters involved.
 
 We have now refactored the project into more classes. The relationship between classes is now as follows: the GameScreen class contains an object of the GameView, the GridView and the World class.  The World class contains an ArrayList of GameObject instances.
 
-![class-hier](images/class-hier.png)
+![class-hier](/assets/images/class-hier.png)
 
 
 

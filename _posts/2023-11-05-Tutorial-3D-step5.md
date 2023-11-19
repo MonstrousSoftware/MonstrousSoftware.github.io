@@ -30,7 +30,7 @@ Add a line to include the latest version of gdx-ode4j:
 ```
 As we have updated a gradle file, we now need to refresh the Gradle project. Click on the Gradle refresh icon in the IDE:
 
-![](images/gradle-refresh.png)
+![](/assets/images/gradle-refresh.png)
 
 
 
@@ -316,7 +316,7 @@ For the shape type, we'll introduce an enumeration:
         }
 ```
 
-![](images/collision-proxy.png)
+![](/assets/images/collision-proxy.png)
 
 -- collision proxies in debug view
 
@@ -463,13 +463,13 @@ So in Blender you need to:
 This way the collision shape will be calculated relative to the original position which was centred on the origin.
 The final transform is taken from node.globalTransform and is used to set the modelInstance transform.
 
-![](images/origin-centred.png)
+![](/assets/images/origin-centred.png)
 <figcaption>step 1 - centre the object on the origin and apply transform.</figcaption>
 
-![](images/origin-adjusted.png)
+![](/assets/images/origin-adjusted.png)
 <figcaption>step 3 - position the object to the desired loction, e.g. with the feet at ground level, but do not apply transform.</figcaption>
 
-![](images/floating-duck.png)
+![](/assets/images/floating-duck.png)
 <figcaption>if the applied transform is not centred on the origin, the collision shape and the graphical mesh will be misaligned. Here the feet are placed at the centre of mass. </figcaption>
 
 
@@ -531,4 +531,4 @@ This concludes step 5 of this tutorial. We've now added collision handling and p
 You should be able to see the three balls in the game, dropping to the ground and making a small bounce. Press R in the game to reload and see it again.
 
 
-![end of step 5](images/physics.png)
+![end of step 5](/assets/images/physics.png)

@@ -6,7 +6,7 @@ by Monstrous Software
 
 Up to now our protagonist has been fighting with what look like red plastic balls.  It is time to upgrade to a Glock-19.
 
-![gun](images/gun-view.png)
+![gun](/assets/images/gun-view.png)
 
 ## Gun pick-up
 

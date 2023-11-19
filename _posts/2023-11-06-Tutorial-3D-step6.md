@@ -452,7 +452,7 @@ define both the camera controller and the player controller as input processors 
 
 One thing we'll quickly notice is when we switch to first person view, we get a view from inside the duck.
 
-![inside duck](images/inside-duck.png)
+![inside duck](/assets/images/inside-duck.png)
 
 Obviously, we should not render the player character in first person view. Let's add a boolean field called `visible` to GameObject to allow us to hide game objects
 and update `GameView.refresh()` to include only scenes from visible game objects:

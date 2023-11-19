@@ -373,6 +373,6 @@ And `PhysicsBody.destroy()` as follows:
 
 This concludes step 10.  We've introduced an enemy character, the concept of health points and taking damage from each other's projectiles and using health packs to restore health. 
 
-![battle.png](images%2Fbattle.png)
+![battle.png](/assets/images/battle.png)
 
 -- action shot

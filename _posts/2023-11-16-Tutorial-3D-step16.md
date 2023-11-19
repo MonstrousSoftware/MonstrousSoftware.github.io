@@ -4,7 +4,7 @@ by Monstrous Software
 
 # Step 16 - Controller Support
 
-![controller](images/controller.png)
+![controller](/assets/images/controller.png)
 
 Game controllers are, for the moment, not supported by gdx-teavm (and can actually crash the application) so this is an option that will only be available on the desktop version.
 Let us add a field in Settings to enable/disable controller support:

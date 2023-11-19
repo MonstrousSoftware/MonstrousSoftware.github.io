@@ -104,7 +104,7 @@ All this method does is create triangles corresponding to the original mesh of t
 a GL20.GL_LINES parameter value (instead of GL_TRIANGLES) the new mesh created from these triangles will be created as a wireframe to be used
 as debug shape visualization.
 
-![arch](images/arch.png)
+![arch](/assets/images/arch.png)
 
 At this point the debug wire frame is misleading because the actual collision shape for the arch is a block.  We can test this by trying to walk through the arch or to shoot balls at it. You cannot go through the arch.
 
@@ -167,7 +167,7 @@ This will make the collision testing more efficient. But also it will help to sm
 To do this we need to supply two node names: one for the complex object and one for the simplified object.  The complex object is what we'll be rendering and what the user will see.  The simplified 
 object is only used for collision detection and will never be seen in-game.
 
-![](images/collisionProxy.png)
+![](/assets/images/collisionProxy.png)
 
 An example is shown in the image above. On the left is a model of a staircase. This model has 132 vertices (which is actually still very low poly). On the right is a simplification of the staircase as a basic slope which uses just 8 vertices in a nice garish colour just to emphasize it will never be seen in-game.
 You can imagine the efficiency benefit is more pronounced when we have super detailed models.
@@ -209,7 +209,7 @@ For all the other lines in the `populate()` method, insert a `null` after the no
 
 Below we can see with the in-game debug view how the staircase is approximated by a simple prism shape.
 
-![stairs](images/staircase.png)
+![stairs](/assets/images/staircase.png)
 
 
 This concludes step 7.

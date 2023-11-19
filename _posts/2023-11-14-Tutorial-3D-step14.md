@@ -9,7 +9,7 @@ It would be cool to use our little hand gun as some kind of sniper rifle and loo
 For the scope view we will simply overlay an image with some alpha masking over the screen. At the same time we will narrow the camera's field of view to zoom in.
 
 
-![scope](images/scope-view.png)
+![scope](/assets/images/scope-view.png)
 
 We introduce a new class to render a full screen image overlay from a texture.  We can animate a recoil effect by scaling this image very briefly so that there is some visual feedback
 when the gun is fired.

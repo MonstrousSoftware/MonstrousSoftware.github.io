@@ -155,7 +155,7 @@ We can build the model file using free software like Blender.
 
 Install Blender from [blender.org](blender.org) and open up the included Blender file 'step3.blend'.
 
-![](images/blender1.png)
+![blender window](/assets/images/blender1.png)
 
 You can see we created a box of 100 by 100 by 1 units in size and applied a texture to it.
 
@@ -178,7 +178,7 @@ This is the file we load with the line we saw earlier:
 The GLTF format is a standard format to exchange 3d models between different software products.
 Windows 10 and Windows 11 have a standard 3D viewer that allows you to view GLTF files, just by clicking on them.
 
-![3dviewer.png](images%2F3dviewer.png)
+![3dviewer.png](/assets/images/3dviewer.png)
 
 
 
@@ -190,6 +190,6 @@ to use far more complicated models.  Also animated models are supported.
 Using the gdx-gltf extension also upgrades the default libGDX shader to PBR (physically based rendering) shaders.
 This allows much more realistic materials, including metallic effects, reflectiveness, etcetera.
 
-![step3.png](images%2Fstep3.png)
+![step3.png](/assets/images/step3.png)
 
 

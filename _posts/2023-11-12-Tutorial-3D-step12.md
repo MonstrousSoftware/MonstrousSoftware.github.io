@@ -11,7 +11,7 @@ In this step we will add a basic User Interface overlay to show the player's hea
 
 The following image shows the UI overlay in action:
 
-![](images/gui.png)
+![gui](/assets/images/gui.png)
 
 
 For this overlay, we will create class called GUI, which we will create and use in the GameScreen class.
