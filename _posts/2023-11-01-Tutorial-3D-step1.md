@@ -36,6 +36,7 @@ a runnable version of the app.
 - [step 16: game controller support](https://monstroussoftware.github.io/2023/11/16/Tutorial-3D-step16.html)
 - [step 17: head bobbing](https://monstroussoftware.github.io/2023/11/17/Tutorial-3D-step17.html)
 - [step 18: full screen mode](https://monstroussoftware.github.io/2023/11/18/Tutorial-3D-step18.html)
+- [step 19: navigation mesh](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step19.html)
 
 
 ## Prerequisites
