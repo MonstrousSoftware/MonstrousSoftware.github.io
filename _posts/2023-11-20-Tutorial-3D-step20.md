@@ -163,7 +163,7 @@ deltaTime values.
 ```
 
 These are the steps needed to have the game run the same, regardless of which frame rate you are using, so that different users get the same experience.
-If you disabled the vsynch(), don't forget to re-enable it after testing.
+If you disabled the vsync(), don't forget to re-enable it after testing.
 
 
 This concludes step 20 where we adapted the code for different frame rates.
