@@ -108,6 +108,7 @@ Instead of this:
 ```
 we now use this:
 ```java
+        sceneManager.update(delta);
         sceneManager.render();
 ```
 In the `resize()` method we can replace the following code:
