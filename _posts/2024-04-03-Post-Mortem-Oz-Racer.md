@@ -14,7 +14,8 @@ The Terrain class keeps a hash table of terrain chunks, creates new chunks as th
 The chunks can be generated fast enough that there is no noticeable stutter even when generated inside the rendering thread.  The terrain chunks are not encapsulated into Game Objects, A debug view shows the chunks in the cache and chunks in view.  
 
 ![terrain chunk allocation view](/assets/images/terrainchunks.png)
-
+- Figure 1: dark tiles are terrain chunks in cache, light tiles are in view
+  
 The infinite terrain is maybe a bit overkill for this game as all the action happens in a relatively small area, but it elegantly solves the problem of what to do at the edge of the world without breaking immersion.  In this case the player can just travel for a very long time though an empty desert until they get bored and turn around.  In “Fright Night” there was very noticeable edge of the world with an invisible boundary. In “Base Invaders” there was a fence placed around the play area to mask the world edge.
 
 ## Rocks
@@ -50,13 +51,19 @@ In previous game jams, I’ve had to choose between post-processing shader effec
 The game view is rendered to a multi-sampled frame buffer.  Then this frame buffer is transferred to a regular frame buffer object after which we can apply full screen shader effects (e.g. vignette effect and contrast enhancement) and put it on the screen. 
 
 The multi-sampled FBO is only available from GL ES 3.1+, so this needs to be requested in the launcher code with configuration.setOpenGLEmulation()  and it is also only available for the lwjgl3 back-end.  If it is not available, the renderer falls back to just using a normal FBO.  
- 
+
+![comparison of anti-aliasing](/assets/images/oz-aa.png)
+- Figure 2: comparison of anti-aliasing, note the jagged lines on the horizon and on the racer
+
 ## Cascaded Shadow Maps
 Shadows seems always tricky to get right.  If the shadow area is set too large the shadows will appear blocky, if it is too small then there will be objects in view that don’t cast shadows. You can increase the size of the depth map, but we need to be wary not to exceed hardware capabilities. I am not sure what is a safe upper limit that will work for everyone.
 
 Shadows are cast by a `DirectionalShadowLight`.  When using gdx-gltf you have to make sure you import the class from gdx-gltf instead of the standard libGDX class of the same name.  This shadow light has an associated orthographic camera to render the scene to a depth map from the light’s point of view.  The viewport size of this camera determines how wide the shadow area is. However, the larger the viewport, the coarser the shadow granularity will be.
 
 In the game you can visualize the shadow light frustum at the starting position via the tweaker menu (the post processing shader needs to be switched off for this).  It is shown as a white wireframe block with a sphere representing the light source at the centre of the top face. A debug visualization like this can be helpful to understand why shadows appear as they do.  For example, if the far plane of the shadow camera is too close, the shadow light box might not even reach the ground.
+
+![wireframe shadow box](/assets/images/oz-shadowbox.png)
+- Figure 3: debug view of shadow light frustum over start position
 
 Since the camera will be moving around a lot, I reposition the directional shadow light every frame to be centred on the player position.
 ```java
@@ -100,6 +107,10 @@ This method was simple and worked reasonably well after tuning the sized of the 
 
 So, I developed some code to calculate the intersection of a rock with the horizontal plane at y=5.  The result is a polygon which gives a 2d outline of the rock at the height of the racer. For the rocks with a bridge shape, the result is two polygons: one for each leg.
 The polygon is calculated by testing each triangle of the mesh for edges that cross the horizontal plane, i.e. that have one vertex above and one vertex below the plane.  We can then determine the intersection point of the edge and the plane.  We gather all these intersection points, pairing up the intersection points that belong to the same triangle.  (Typically, if there is one edge of a triangle that intersects the plane, there will also be one other edge). Then we iterate through these intersection points until we have one or more loops which are our outline polygons.
+
+![collision polygons](/assets/images/oz-colliders.png)
+- Figure 4 : polygon colliders
+
 We only have to calculate these polygons once at startup.  Then we maintain an Array of polygons for collision detection.
 To detect if a point (the racer) is inside a `Polygon` (a rock), we use the standard method `Polygon#contains(Vector2)`.  For an early out, we first use `poly.getBoundingRectangle().contains(vec2)` to cheaply discard cases where the point is not even inside the polygon’s bounding rectangle.
 To reduce the number of collision tests to check, we make use of a spatial hash.  We divided the world into a grid and keep an array of collider polygons per grid cell (‘a bucket’). If a rock is large enough to span multiple grid cells, its polygon will be added to the bucket of each of those grid cells.  Now to test for collision, we only need to work out in which grid cell the racer is located and test against the polygons from its bucket. So instead of testing hundreds of polygons per frame, we typically test two or three.
