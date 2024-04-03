@@ -70,7 +70,7 @@ Since the camera will be moving around a lot, I reposition the directional shado
         light.setCenter(world.playerPosition); // keep shadow light on player so that we have shadows
 ```
 One new feature in gdx-gtlf that helps avoid blocky shadows versus missing shadows is *cascaded shadow maps*. Instead of one shadow map, you have multiple. The shadow map that is used depends on the depth of the fragment.  So, you can have coarse shadows in the distance where we can’t tell anyway and fine detailed shadows near the viewer.
-It only takes a few lines to set up.  Tuning parameters are the number of cascades, the minimum depth and the split factor. I used three cascades (the default map plus 2 extra). For the depth I specified zero which means the frustum depth is used and I use a split factor of 20, which is perhaps a bit extreme, to give lots of detail up close.   These are not necessarily the optimum settings and could maybe do with a bit more tuning.  For example, during the zoom-in at the start of a race, you can clearly notice a visual transition between cascades for the racer’s shadow.
+It only takes a few lines to set up.  Tuning parameters are the number of cascades, the minimum depth and the split factor. I used three cascades (the default map plus 2 extra). For the depth I specified zero which means the frustum depth is used and I use a split factor of 20, which is perhaps a bit extreme, to give lots of detail up close.   These are not necessarily the optimum settings and could maybe do with a bit more tuning.  For example, during the zoom-in at the start of a race, you can clearly notice a visual transition between cascades for the racer’s shadow. It is no longer needed to reposition the light position as the `setCascades` method sets the cascade shadow boxes to cover the scene camera's frustum.
 
 During setup:
 ```java
@@ -81,8 +81,6 @@ During setup:
 ```
 In the render method:
 ```java
-        // relocate shadow light
-        light.setCenter(world.playerPosition); // keep shadow light on player so that we have shadows
         if(Settings.cascadedShadows) {
             csm.setCascades(sceneManager.camera, light, 0, 20f);
         }
