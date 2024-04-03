@@ -142,13 +142,13 @@ From DefaultRenderableSorter.java:
 		final float dst = (int)(1000f * camera.position.dst2(tmpV1)) - (int)(1000f * camera.position.dst2(tmpV2));
 		final int result = dst < 0 ? -1 : (dst > 0 ? 1 : 0);
 		return b1 ? -result : result;
-}
+	}
 ```
 The problem is that if the distance from camera to object is let’s say 1500 units, then the square of that distance is 2,250,000, multiplied by 1000 is 2,250,000,000 while the Java maximum integer value is 2,147,483,647. So, at this point the distance calculate results in an integer overflow and it is easy to understand how this can lead to inconsistent comparisons. I have no idea why this is a fatal error on the teavm platform and not on lwjgl3.
 
 To fix, this we either adjust the world scale to reduce all the distances or we can supply our own renderable sorter which removes this overflow problem.
 
-SceneManager uses its own renderable sorter: SceneRenderableSorter which makes more advanced comparisons of the two renderables following the suggestion from the FIXME comment in the default renderable sorter. Comparisons are made in order to cluster together renderables which use the same shader, the same environment, the same material or the same mesh.  The idea is by clever sorting, we can reduce the number of switches we need to do between shaders, materials, etcetera. SceneManager still uses the default renderable sorter for the depth pass though.
+SceneManager uses its own renderable sorter: `SceneRenderableSorter` which makes more advanced comparisons of the two renderables following the suggestion from the FIXME comment in the default renderable sorter. Comparisons are made in order to cluster together renderables which use the same shader, the same environment, the same material or the same mesh.  The idea is by clever sorting, we can reduce the number of switches we need to do between shaders, materials, etcetera. SceneManager however still uses the default renderable sorter for the depth pass.
 
 While experimenting with a replacement renderable sorter, I discovered that, surprisingly, the fastest method is not to do any sorting at all. 
 Apparently, the benefit of the GPU avoiding overdraw does not compensate for the cost of the CPU having to perform the sort operation.  
