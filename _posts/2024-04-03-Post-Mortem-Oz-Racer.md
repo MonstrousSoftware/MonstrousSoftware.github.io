@@ -13,6 +13,8 @@ The Terrain class keeps a hash table of terrain chunks, creates new chunks as th
 
 The chunks can be generated fast enough that there is no noticeable stutter even when generated inside the rendering thread.  The terrain chunks are not encapsulated into Game Objects, A debug view shows the chunks in the cache and chunks in view.  
 
+![terrain chunk allocation view](/assets/images/terrainchunks.png)
+
 The infinite terrain is maybe a bit overkill for this game as all the action happens in a relatively small area, but it elegantly solves the problem of what to do at the edge of the world without breaking immersion.  In this case the player can just travel for a very long time though an empty desert until they get bored and turn around.  In “Fright Night” there was very noticeable edge of the world with an invisible boundary. In “Base Invaders” there was a fence placed around the play area to mask the world edge.
 
 ## Rocks
