@@ -49,7 +49,7 @@ The only problem remaining is a little island that appears under the slope. We w
 
 Now you can use the "Export at GLTF" button to download the generated navmesh. Save it somewhere and then import it into the Blender file (File/Import/glTF 2.0).  Rename the imported object from "Mesh-01" to "NAVMESH" because that is what our game will be looking for.
 
-In Blender we have to get rid of that island under the slope. Hide all other objects (Select and press H). Select NAVMESH and go to Edit mode (Tab) and be sure to be in face mode (press 3).  Select all faces belonging to islands (e.g. by pressing L when the mouse if over each face) and delete them.
+In Blender we have to get rid of that island under the slope. Hide all other objects (Select and press H). Select NAVMESH and go to Edit mode (Tab) and be sure to be in face mode (press 3).  Select all faces belonging to islands (e.g. by pressing L to select the face under the mouse pointer) and delete them.
 It is very important that there are no unreachable islands in the navmesh.
 
 Then export the static, dynamic objects and the nav mesh to the gltf file that will be loaded by the game (step21.gltf).  This time use glTF separate format, especially if we are targeting a web version of the game.  
