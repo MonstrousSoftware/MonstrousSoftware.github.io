@@ -89,22 +89,22 @@ In the render method:
 For some reason the shadows in the web version are much darker than in the desktop version. Normally, you expect the ambient light level to reduce the darkness where the shadow light cannot reach. (This was due to a bug in gdx-teaVM which is in the process of being fixed, see LibGDX Discord gdx-teaVM thread on 15/05)
 
 ## Collision
-Perhaps surprisingly, this game does not use a physics engine.  The racer movement is controller by the `PlayerController` class.  What remains is collision detection. Mostly of the racer versus the rocks.  There are only 5 rock models which are randomly distributed on the map.  The rock models are randomly scaled and randomly rotated around the up axis.
+Perhaps surprisingly, this game does not use a physics engine.  The racer movement is controlled by the `PlayerController` class as mentioned before.  What remains is collision detection. Mostly of the racer versus the rocks.  There are 5 rock models which are randomly distributed on the map.  The rock models are randomly scaled and randomly rotated around the up axis.
 The collision detection is helped somewhat by the fact that the racer always has a fixed height of 5 units above a gently sloping terrain and all the obstacles are static objects. 
 
 So, the collision problem can be approximated quite well as a 2D collision problem.
 
-In the first instance, I implemented a 2d collision detection system where each rock was represented by a circle.  The rocks shaped as a gate, were represented as two circles, one for each side.  The oblong rocks were represented as a line of three circles.  The circles are scaled according to the rock’s scale.
-The racer is represented as a single point at its center.  This makes the collision detection quite forgiving.
+In the first instance, I implemented a 2d collision detection system where each rock was approximated by a circle.  The rocks that are shaped as a gate were represented as two circles, one for each pillar.  The oblong rocks were represented as a line of three circles.  The circles are scaled according to the rock’s scale.
+The racer is represented as a single point at its center.  This makes the collision detection quite forgiving as it allows a wing to clip through a rock.
 
 To detect if a point is inside a circle on the same plane is very simple and very fast: just check if the distance to the circle centre is smaller than the circle radius.  There are fewer than 500 rocks so this can be checked pretty quickly.
 In case of collision, i.e. the racer position is inside a circle, it is useful to know the direction of the surface where it hit, i.e. the normal vector of the collision surface.  For collision with a circle, this is very simple: the normal vector is always pointing outwards, away from the circle centre.
-The collision response is then to instantly move the racer some distance away from the collider and adjust its velocity vector by reflecting it over the normal vector. It was found to be very disorientating to change the orientation of the racer, so this remained unchanged.
+The collision response is then to instantly move the racer some distance away from the collider and adjust its velocity vector by reflecting it over the normal vector (bouncing off the rock). It was found to be very disorientating to change the orientation of the racer, so this remained unchanged.
 
-This method was simple and worked reasonably well after tuning the sized of the circles for each rock type.  However, narrowly evading the rocks is the core gameplay for this jam game and the circles only make a rough approximation.  Colliding with an invisible part of a rock would be very frustrating for the player.  And clipping through a rock when it should have been a collision feels like cheating.
+This method was simple and worked reasonably well after tuning the sizes of the circles for each rock type.  However, narrowly evading the rocks is the core gameplay mechanic for this jam game and the circles only make a rough approximation.  Colliding with an invisible part of a rock would be very frustrating for the player.  And clipping through a rock when it should have been a collision feels like cheating.
 
 So, I developed some code to calculate the intersection of a rock with the horizontal plane at y=5.  The result is a polygon which gives a 2d outline of the rock at the height of the racer. For the rocks with a bridge shape, the result is two polygons: one for each leg.
-The polygon is calculated by testing each triangle of the mesh for edges that cross the horizontal plane, i.e. that have one vertex above and one vertex below the plane.  We can then determine the intersection point of the edge and the plane.  We gather all these intersection points, pairing up the intersection points that belong to the same triangle.  (Typically, if there is one edge of a triangle that intersects the plane, there will also be one other edge). Then we iterate through these intersection points until we have one or more loops which are our outline polygons.
+The polygon is calculated by testing each triangle of the mesh for edges that cross the horizontal plane, i.e. that have one vertex above and one vertex below the plane.  We can then determine the intersection point of the edge and the plane through linear interpolation.  We gather all these intersection points, pairing up the intersection points that belong to the same triangle.  (if there is one edge of a triangle that intersects the plane, there will also be one other edge that intersects, apart from some edge cases). Then we iterate through these intersection points until we have one or more loops which are our outline polygons.
 
 ![collision polygons](/assets/images/oz-colliders.png)
 - Figure 4 : polygon colliders
@@ -112,7 +112,7 @@ The polygon is calculated by testing each triangle of the mesh for edges that cr
 We only have to calculate these polygons once at startup.  Then we maintain an Array of polygons for collision detection.
 To detect if a point (the racer) is inside a `Polygon` (a rock), we use the standard method `Polygon#contains(Vector2)`.  For an early out, we first use `poly.getBoundingRectangle().contains(vec2)` to cheaply discard cases where the point is not even inside the polygon’s bounding rectangle.
 To reduce the number of collision tests to check, we make use of a spatial hash.  We divided the world into a grid and keep an array of collider polygons per grid cell (‘a bucket’). If a rock is large enough to span multiple grid cells, its polygon will be added to the bucket of each of those grid cells.  Now to test for collision, we only need to work out in which grid cell the racer is located and test against the polygons from its bucket. So instead of testing hundreds of polygons per frame, we typically test two or three.
-Having found an efficient and accurate collision system, I also added the wind turbines and the gates as colliders, so it is possible to crash into those.
+Having found an efficient and accurate collision system, I also added the wind turbines and the start and finish gates as colliders, so it is possible to crash into those.
 
 ## Model cache
 Perhaps the obvious solution to rendering many rocks or many wind turbines is to use OpenGL instanced rendering.  This is a relatively new feature in OpenGL that allows to render the same mesh very efficiently in many locations and orientations.  This is used to render thousands of blades of grass for example. It works by reducing the amount of data sent from the CPU to the GPU per frame. Instead of sending thousands of meshes, it sends only one mesh and then thousands of position vectors (the instance data).  See my “Duck Field” demo for an example. This feature does however require GL ES 3.0+ which not everybody may have available.
@@ -120,18 +120,18 @@ Perhaps the obvious solution to rendering many rocks or many wind turbines is to
 An older and simpler method of speeding up the rendering of multiple model instances is the libGDX concept of model caches.  Normally, each model instance requires a draw call to be rendered. A draw call is the CPU giving an instruction to the CPU and the number of draw calls per frame is an important metric to keep in mind to obtain high frame rates. By grouping model instances into a model cache, many instances can be rendered using a single draw call.
 
 It turned out to be more efficient to render all the rocks every frame via a model cache, than to perform frustum culling to render only the rocks that are in view.
-This also solved another annoying problem from an early version: shadow popping.  This would happen when a rock would disappear just to the left or right of the camera view and would be frustum culled. But then its shadow (which was still in view) would also instantly disappear.  Without the model cache this would be hard to fix properly.
+This also solved another annoying problem from an early version: shadow popping.  This would happen when a rock would be positioned just to the left or right of the camera view and therefore would be frustum culled. But then its shadow (which should be still in view) would also instantly disappear, which is incorrect. Without the model cache this would be hard to fix properly.
 
-The wind turbines masts were likewise also grouped into a model cache.  The turbine blades could not be because they are moving.
+The wind turbines masts were likewise also grouped into a model cache.  The turbine blades could not be combined into a model cache because they are rotating.
  
 ## Renderable Sorter
 An annoying bug appeared when running on the teavm version. The game would halt with a mysteriously worded exception:
 ```
 	java.lang.IllegalArgumentException: Comparison method violates its general contract!
 ```
-It turns out this exception is raised by `Array.sort` when it spots that the comparison function used by the sorter returns inconsistent results. For example, if compare(A,B) returns -1, compare(B,C) returns -1, but compare(A, C) returns 1 which is logically impossible: if A < B and B < C it follows that A < C.  This was a head scratcher because I am was not sorting anything in my code.
+It turns out this exception is raised by the standard LibGDX method `Array.sort` when it spots that the comparison function used by the sorter returns inconsistent results. For example, if compare(A,B) returns -1, compare(B,C) returns -1, but compare(A, C) returns 1 which is logically impossible: if A < B and B < C it follows that A < C.  This was a head scratcher because I am was not sorting anything in my code.
 
-In the end it boiled down to the sorting of renderables before they are rendered by `SceneManager` or by `ModelBatch`.  When you call `ModelBatch#end()` it will sort all the renderables it has accumulated to place the opaque renderables front to back and the blended renderables back to front (and in front of the opaque renderables).  The idea of sorting the opaque renderables from close by to far away is that the closer renderables may obscure the further ones, so a simple depth rejection will prevent the further ones to be rendered unnecessarily. This could speed up the rendering.
+In the end it boiled down to the sorting of renderables before they are rendered by `SceneManager` or by `ModelBatch`.  When you call `ModelBatch#end()` it will sort all the renderables it has accumulated to place the opaque renderables front to back and the blended renderables back to front (and in front of the opaque renderables).  The idea of sorting the opaque renderables from close by to far away is that the closer renderables may obscure the further ones, so a simple depth rejection will prevent the further ones to be rendered unnecessarily (we reduce overdraw). This could speed up the rendering.
 
 To do this, the compare method looks at the distance of the two renderables to the camera to work out which is closer.
 The `dst2()` method is used to get the square of the distance from the camera to the renderable. Using `dst2()` instead of `dst()` is a classic (perhaps outdated) optimization to avoid a square root operation.  Then the square distances are multiplied by 1000 and converted to integers, to allow a precision of 0.001 but avoiding floating point comparison issues. Then these integers are subtracted and the result is truncated to -1, 0 or 1.
@@ -159,12 +159,12 @@ The problem is that if the distance from camera to object is let’s say 1500 un
 
 To fix, this we either adjust the world scale to reduce all the distances or we can supply our own renderable sorter which removes this overflow problem.
 
-SceneManager uses its own renderable sorter: `SceneRenderableSorter` which makes more advanced comparisons of the two renderables following the suggestion from the FIXME comment in the default renderable sorter. Comparisons are made in order to cluster together renderables which use the same shader, the same environment, the same material or the same mesh.  The idea is by clever sorting, we can reduce the number of switches we need to do between shaders, materials, etcetera. SceneManager however still uses the default renderable sorter for the depth pass.
+SceneManager uses its own renderable sorter for the render pass: `SceneRenderableSorter` which makes more advanced comparisons of the two renderables following the suggestion from the FIXME comment in the default renderable sorter. Comparisons are made in order to cluster together renderables which use the same shader, the same environment, the same material or the same mesh.  The idea is by clever sorting, we can reduce the number of switches we need to do between shaders, materials, etcetera. For the depth pass, SceneManager uses the default renderable sorter.
 
 While experimenting with a replacement renderable sorter, I discovered that, surprisingly, the fastest method is not to do any sorting at all. 
 Apparently, the benefit of the GPU avoiding overdraw does not compensate for the cost of the CPU having to perform the sort operation.  
 
-Granted, in this jam game there are no blended renderables so it is a simplified use case.  In case of blended renderables, the render order is important for visual fidelity.
+Granted, in this jam game there are no blended renderables so the renderable sorting was only supposed to improve performance.  In case you have blended renderables in your game, the render order is important for visual fidelity: the renderables need to be blended with what is behind them, which therefore needs to be rendered before.
 
 ## Debug stuff
 A technique which is quite helpful is to have general game settings as static members of a `Settings` class.
