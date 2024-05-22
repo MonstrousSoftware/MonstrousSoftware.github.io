@@ -59,7 +59,7 @@ A window pops up, asking for details of the project you want to build. There are
 will generate the project outline for us.
 
 In the main screen we fill in:
-- the name of the project: 'TutorialFPS'
+- the name of the project: 'Tut3D'
 - a package identifier, for example 'com.yourcompany.yourgame'
 - the name of the main class. I tend to just call it 'Main' for ease of reference.
 - the directory for the project.  You can either create an empty folder first and then navigate to it using the 'Browse' icon, or type in a name for the folder and press the 'Create Folder' button.
@@ -96,7 +96,7 @@ This will take a little while.
 
 Open the Gradle menu on the right hand side. Navigate to TutorialFPS/lwjgl3/tasks/application and double-click on the run icon.
 (Note: the module lwjgl3 is commonly known as the desktop version).
-This will open a window called 'TutorialFPS' with a slightly disappointing black screen for content.
+This will open a window called 'Tut3D' with a slightly disappointing black screen for content.
 
 At this point the project structure is created, and we need to start filling in some content.
 
