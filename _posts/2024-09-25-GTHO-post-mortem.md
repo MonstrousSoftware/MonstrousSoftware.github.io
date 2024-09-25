@@ -20,6 +20,8 @@ Although it is tempting to model the track as an array of intersecting links, th
 
 A few animations were added: forward roll, fire and idle. There is also a cool collapse animation which in the end was never used.
 
+![patrol bot](/assets/images/gtho-patrolbot.png)
+
 ## Level design
 One of the early questions was what method to use to model the level.  The level would consist of walls, corridors and rooms in a confined space.To simplify matters the map would essentially be 2d, there would be no bridges, rooms above other rooms, etc.
 
@@ -35,6 +37,8 @@ An early demo was commented to have a bit of a creepy “backrooms” vibe.
 The Backrooms is a bit of an internet cult spun off from a photo of an abandoned office space with yellowing wallpaper posted on 4chan. More on the back rooms here [vice.com](https://www.vice.com/en/article/is-the-backrooms-real/.)  
 
 I looked a bit more into the backrooms meme and decided to lean into this, using the same wallpaper design, dirty carpet and general aesthetic.
+
+![level](/assets/images/gtho-blender.png)
   
 ## Screen Effects
 The popular [“backrooms found footage”](https://www.youtube.com/watch?v=H4dGpz6cnHo) videos by Kane Pixels are presented as low- quality VCR recordings, so I adapted the TV noise shader from the [“Fright Night”](https://monstrous-software.itch.io/fright-night) intro (which in turn is based on [a ShaderToy demo](https://www.shadertoy.com/view/Mt2XDV) by RafaSKB) and a [blur filter](https://www.youtube.com/watch?v=uZlwbWqQKpc) as a post-processing pass.  The 3d scene is rendered to a frame buffer, and then shaders are applied to manipulate the image and finally the frame buffer is rendered to the screen.
