@@ -8,7 +8,7 @@ To somehow shoehorn in the theme (the four elements) they would be objects to co
 
 In the game you must find the four cards representing the four elements in a labyrinthine level, avoid getting shot by patrolling robots and then leave through the exit door which is only opened once all four cards have been found.
 
-The easter egg (aggressive banana) appears as a poster in one of the rooms featuring an old friend: the anthropomorphic banana from [“Under the Sea”](link) (jam #25).
+The easter egg (aggressive banana) appears as a poster in one of the rooms featuring an old friend: the anthropomorphic banana from [“Under the Sea”](https://monstrous-software.itch.io/under-the-sea) ([jam #25](https://itch.io/jam/libgdx-jam-30).
 
 ## Patrol Bot
 At this point I modeled a small, tracked robot in Blender.  The robot would move on two triangular tracks, each around three wheels (a bit like Wall-E as I realized later).  It would have a body and a head that could swivel.  
@@ -37,7 +37,7 @@ The Backrooms is a bit of an internet cult spun off from a photo of an abandoned
 I looked a bit more into the backrooms meme and decided to lean into this, using the same wallpaper design, dirty carpet and general aesthetic.
   
 ## Screen Effects
-The popular [“backrooms found footage”](https://www.youtube.com/watch?v=H4dGpz6cnHo) videos by Kane Pixels are presented as low- quality VCR recordings, so I adapted the TV noise shader from the [“Fright Night”](link) intro and a blur filter as a post-processing pass.  The 3d scene is rendered to a frame buffer, and then shaders are applied to manipulate the image and finally the frame buffer is rendered to the screen.
+The popular [“backrooms found footage”](https://www.youtube.com/watch?v=H4dGpz6cnHo) videos by Kane Pixels are presented as low- quality VCR recordings, so I adapted the TV noise shader from the [“Fright Night”](https://monstrous-software.itch.io/fright-night) intro and a blur filter as a post-processing pass.  The 3d scene is rendered to a frame buffer, and then shaders are applied to manipulate the image and finally the frame buffer is rendered to the screen.
 When the player is hit by a bullet, a quick flash of red is added to the whole screen using the shader.
 
 ## Camera sway
@@ -78,7 +78,7 @@ If there is no collision, we can move to the new position. If there are one or m
 (Initially I had a bug because I was only checking for a single collider and then you could clip through an inside corner.)
 For bullet movement, we do the same type of collision detection with the static colliders.  For collision response, we simply delete the bullet.  To test if the bullet hits the player, we do a simple proximity test and if close enough let the player take damage and delete the bullet.
 This simple collision detection has its limitations:
--	For every collision check we iterate through all the colliders.  This happens every frame for the player and for every bullet. There are about 100 colliders constructed from the level. It’s a brute force approach that won’t scale well for a bigger level.  It could be optimized by clustering colliders by area, e.g. use a hash table to group colliders by grid cell and then you would have to check far fewer colliders. You can find this implemented in Oz Racer.
+-	For every collision check we iterate through all the colliders.  This happens every frame for the player and for every bullet. There are about 100 colliders constructed from the level. It’s a brute force approach that won’t scale well for a bigger level.  It could be optimized by clustering colliders by area, e.g. use a hash table to group colliders by grid cell and then you would have to check far fewer colliders. You can find this implemented in [Oz Racer](https://monstrous-software.itch.io/oz-racer).
 -	We use axis-aligned bounding boxes. All the walls in the level must be placed at right angles. A wall at 45 degrees (as seen from above), would cause the player to bump into invisible boundaries.  This could be remedied by using oriented bounding boxes as a second level collision check.
 -	There is no collision check between player and robot.  The robot doesn’t need to perform collision checks as it is on a fixed path.
 -	There are some walls with windows, but bullets cannot fly through the windows, because obviously they are of bulletproof glass.
