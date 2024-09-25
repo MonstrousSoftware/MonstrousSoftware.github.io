@@ -1,14 +1,14 @@
 # Post Mortem – “Get the Heck Out”
 September 2024
 
-This is the post mortem for the making of a game for the September 2024 LibGDX game jam #30. In the game jam you must develop a LibGDX game in one week following a given theme and for bonus points include an easter egg.
+This is the post mortem for the making of a game for the [September 2024 LibGDX game jam #30](https://itch.io/jam/libgdx-jam-30). In the game jam you must develop a LibGDX game in one week following a given theme and for bonus points include an easter egg.
 
 I already had the idea to make an indoor first-person game and maybe have some killer robots.  At this point I was thinking of a Doom style boss level where you have to dodge rockets, something like E3M8 where you have to beat the spider mastermind.
 To somehow shoehorn in the theme (the four elements) they would be objects to collect.
 
 In the game you must find the four cards representing the four elements in a labyrinthine level, avoid getting shot by patrolling robots and then leave through the exit door which is only opened once all four cards have been found.
 
-The easter egg (aggressive banana) appears as a poster in one of the rooms featuring an old friend: the anthropomorphic banana from [“Under the Sea”](https://monstrous-software.itch.io/under-the-sea) ([jam #25](https://itch.io/jam/libgdx-jam-30)).
+The easter egg (aggressive banana) appears as a poster in one of the rooms featuring an old friend: the anthropomorphic banana from [“Under the Sea”](https://monstrous-software.itch.io/under-the-sea) (jam #25).
 
 ## Patrol Bot
 At this point I modeled a small, tracked robot in Blender.  The robot would move on two triangular tracks, each around three wheels (a bit like Wall-E as I realized later).  It would have a body and a head that could swivel.  
