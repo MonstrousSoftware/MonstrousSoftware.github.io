@@ -8,7 +8,7 @@ To somehow shoehorn in the theme (the four elements) they would be objects to co
 
 In the game you must find the four cards representing the four elements in a labyrinthine level, avoid getting shot by patrolling robots and then leave through the exit door which is only opened once all four cards have been found.
 
-The easter egg (aggressive banana) appears as a poster in one of the rooms featuring an old friend: the anthropomorphic banana from [“Under the Sea”](https://monstrous-software.itch.io/under-the-sea) ([jam #25](https://itch.io/jam/libgdx-jam-30).
+The easter egg (aggressive banana) appears as a poster in one of the rooms featuring an old friend: the anthropomorphic banana from [“Under the Sea”](https://monstrous-software.itch.io/under-the-sea) ([jam #25](https://itch.io/jam/libgdx-jam-30)).
 
 ## Patrol Bot
 At this point I modeled a small, tracked robot in Blender.  The robot would move on two triangular tracks, each around three wheels (a bit like Wall-E as I realized later).  It would have a body and a head that could swivel.  
