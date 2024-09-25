@@ -6,7 +6,7 @@ This is the post mortem for the making of a game for the [September 2024 LibGDX 
 I already had the idea to make an indoor first-person game and maybe have some killer robots.  At this point I was thinking of a Doom style boss level where you have to dodge rockets, something like E3M8 where you have to beat the spider mastermind.
 To somehow shoehorn in the theme (the four elements) they would be objects to collect.
 
-In the game you must find the four cards representing the four elements in a labyrinthine level, avoid getting shot by patrolling robots and then leave through the exit door which is only opened once all four cards have been found.
+In the game you must find the four cards representing the four elements in a labyrinthine level, avoid getting shot by patrolling robots and then leave through the exit door which is only opened once all four cards have been found. You can play the game on [itch.io](https://monstrous-software.itch.io/get-the-heck-out).
 
 The easter egg (aggressive banana) appears as a poster in one of the rooms featuring an old friend: the anthropomorphic banana from [“Under the Sea”](https://monstrous-software.itch.io/under-the-sea) (jam #25).
 
