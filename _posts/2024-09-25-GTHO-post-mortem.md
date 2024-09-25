@@ -37,8 +37,9 @@ The Backrooms is a bit of an internet cult spun off from a photo of an abandoned
 I looked a bit more into the backrooms meme and decided to lean into this, using the same wallpaper design, dirty carpet and general aesthetic.
   
 ## Screen Effects
-The popular [“backrooms found footage”](https://www.youtube.com/watch?v=H4dGpz6cnHo) videos by Kane Pixels are presented as low- quality VCR recordings, so I adapted the TV noise shader from the [“Fright Night”](https://monstrous-software.itch.io/fright-night) intro and a blur filter as a post-processing pass.  The 3d scene is rendered to a frame buffer, and then shaders are applied to manipulate the image and finally the frame buffer is rendered to the screen.
-When the player is hit by a bullet, a quick flash of red is added to the whole screen using the shader.
+The popular [“backrooms found footage”](https://www.youtube.com/watch?v=H4dGpz6cnHo) videos by Kane Pixels are presented as low- quality VCR recordings, so I adapted the TV noise shader from the [“Fright Night”](https://monstrous-software.itch.io/fright-night) intro (which in turn is based on [a ShaderToy demo](https://www.shadertoy.com/view/Mt2XDV) by RafaSKB) and a [blur filter](https://www.youtube.com/watch?v=uZlwbWqQKpc) as a post-processing pass.  The 3d scene is rendered to a frame buffer, and then shaders are applied to manipulate the image and finally the frame buffer is rendered to the screen.
+
+If the player is hit by a bullet, a quick flash of red is added to the whole screen using the shader.
 
 ## Camera sway
 To simulate the handheld camera effect the camera’s up vector is tilted depending on the camera’s position using some sine waves using the camera position as input.  This effect is probably quite nauseating for many people, so it can be switched off in the options menu (camera stabilization).
