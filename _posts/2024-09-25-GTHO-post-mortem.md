@@ -85,7 +85,7 @@ For bullet movement, we do the same type of collision detection with the static 
 This simple collision detection has its limitations:
 -	For every collision check we iterate through all the colliders.  This happens every frame for the player and for every bullet. There are about 100 colliders constructed from the level. It’s a brute force approach that won’t scale well for a bigger level.  It could be optimized by clustering colliders by area, e.g. use a hash table to group colliders by grid cell and then you would have to check far fewer colliders. You can find this implemented in [Oz Racer](https://monstrous-software.itch.io/oz-racer).
 -	We use axis-aligned bounding boxes. All the walls in the level must be placed at right angles. A wall at 45 degrees (as seen from above), would cause the player to bump into invisible boundaries.  This could be remedied by using oriented bounding boxes as a second level collision check.
--	There is no collision check between player and robot.  The robot doesn’t need to perform collision checks as it is on a fixed path.
+-	There is no collision check between robot and walls.  The robot doesn’t need to perform collision checks as it is on a fixed path. Robots do a simple proximity test for collision with the player.
 -	There are some walls with windows, but bullets cannot fly through the windows, because obviously they are of bulletproof glass.
 
 ## Spawn points
