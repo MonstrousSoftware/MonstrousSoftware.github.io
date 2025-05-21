@@ -3,9 +3,12 @@
 
 ## Introduction
 
-This is a write up of installing Linux on Windows 10 using WSL (Windows Sybsystem for Linux) in order to test LibGDX apps.
-Using WSL is perhaps easier to work with than a dual boot solution.  You can have Linux and Windows applications side by side.  You can compile under Windows and then run the jar file under Linux.
+This is a write up of installing Linux on Windows 10 using WSL (Windows Sybsystem for Linux) in order to test if cross-platform LibGDX apps will work on Linux.
+Using WSL is perhaps easier to work with than a dual boot solution.  You can have Linux and Windows applications side by side.  You can compile under Windows and then immediately run it under Linux.
 
+![LibGDX app on a Linux desktop](/assets/images/WSL-desktop.png)
+
+*Image: A LibGDX jam game on a Linux desktop within Windows 10* 
 
 
 ## Step 1: Install WSL on Windows
@@ -214,5 +217,5 @@ More importantly there is no sound.  The following errors appear in the console.
 	error: XDG_RUNTIME_DIR is invalid or not set in the environment.
 
 Surprisingly, there seems to be a general problem to have audio under WSL.  
-Some suggestions on-line are to forward audio to a pulseaudio server running on Windows, but so far I did not get this to work.
+Some suggestions on-line are to forward audio to a pulseaudio server running on Windows, but so far I did not get this to work. So to test audio, you may still need to run it on a Linux box.
 
