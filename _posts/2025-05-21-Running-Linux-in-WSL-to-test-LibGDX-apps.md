@@ -62,7 +62,7 @@ Since this is a fresh install of Ubuntu, java will not be available.
 If you type the java command in the shell you will get an error message because it cannot be found.
 We need to install a Java run-time environment. 
 
-The following command installs the default JRE:
+The following command in the Linux terminal installs the default JRE:
 
 	$ sudo apt install default-jre
 
