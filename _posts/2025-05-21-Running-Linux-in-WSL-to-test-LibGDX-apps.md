@@ -13,7 +13,7 @@ Using WSL is perhaps easier to work with than a dual boot solution.  You can hav
 
 ## Step 1: Install WSL on Windows
 
-Instructions are provided in this Microsoft article: https://learn.microsoft.com/en-us/windows/wsl/install
+Instructions are provided in this [Microsoft article](https://learn.microsoft.com/en-us/windows/wsl/install).
 
 First find "Turn Windows features on and off" by typing it in the search bar.
 
@@ -56,7 +56,7 @@ If it should say version 1, use the following command to upgrade to WSL version 
 
 ## Step 2: Java run-time
 
-To distribute a LibGDX game, there are different methods. (https://libgdx.com/wiki/deployment/deploying-your-application).
+To distribute a LibGDX game, there are different methods. See [LibGDX - Deploying your Application](https://libgdx.com/wiki/deployment/deploying-your-application).
  
 One popular method is as a "fat jar" which is cross-platform and should run anywhere that can run java. A "fat jar" means the jar file includes all its
 dependencies (jar files from other libraries such a LWJGL3 and GLFW for example), so that it can be run stand-alone.
@@ -117,8 +117,8 @@ The problem is that we are running in a console, but we need a windowing environ
 There are many window managers available under Ubuntu, popular ones are GNOME and KDE. 
 We will instead install a very lightweight one, called xfce4, that should be sufficient for our needs.
 
-For this we can follow the steps from the following Youtube video by Ksk Royal “How To Install Ubuntu 24.04 On Windows 11 Using WSL With GUI (NEW GUIDE)”
-(https://www.youtube.com/watch?v=iXAWNVgOUrw):
+For this we can follow the steps from the following Youtube video by Ksk Royal 
+[How To Install Ubuntu 24.04 On Windows 11 Using WSL With GUI (NEW GUIDE)](https://www.youtube.com/watch?v=iXAWNVgOUrw):
 
 Use `apt update` to download the latest version of the package list. 
 
@@ -145,9 +145,7 @@ The last command results in some errors:
 	 systemd
 	E: Sub-process /usr/bin/dpkg returned an error code (1)
 
-After some googling, I found this is a known issue with WSL that is reported on the Microsoft issue tracker:
-
-See WSL issue : https://github.com/microsoft/WSL/issues/10397
+After some googling, I found this is a [known issue](https://github.com/microsoft/WSL/issues/10397) with WSL that is reported on the Microsoft issue tracker:
 
 The work-around is to replace the program `systemd-sysusers` with a dummy. We don't need to create system users or system groups, so skipping this 
 command is fine.  We copy the original binary from the /bin folder to the temporary folder, just in case.  
@@ -221,6 +219,8 @@ and hey presto! The LibGDX application should open in a new window within the xf
 We have found an easy way to test if your LibGDX application works in a Linux environment, without the need for a separate computer or dual-booting.
 Because the Linux environment appears within a Windows window, it is fast to switch between the operation systems.  For example, to build the application 
 using your Java development environment under Windows and then switching to the xfce4 desktop to run it.  
+
+If you spot any mistakes or have some additions, please leave a comment below.
 
 
 
