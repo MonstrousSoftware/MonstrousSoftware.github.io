@@ -36,7 +36,7 @@ See a list of available Linux distributions with the following command:
 
 And install, for example, a recent version of Ubuntu using:
 
-	wsl -- install -d Ubuntu-24.04
+	wsl --install -d Ubuntu-24.04
 
 Once it has finished installing, you will be prompted to choose a username and a password for this Linux system.
 Remember them well because you will be using them a lot in the next steps.
@@ -44,6 +44,15 @@ Remember them well because you will be using them a lot in the next steps.
 You will now have access to the Ubuntu operating system via a command terminal using the bash shell. 
 You can enter this terminal window at any time by typing `wsl` from the Windows Search bar.
 
+Use the following command in Powershell to make sure Ubuntu uses WSL2 rather than WSL1:
+
+	wsl -l -v
+	   NAME      STATE           VERSION
+	* Ubuntu    Stopped         2
+
+If it should say version 1, use the following command to upgrade to WSL version 2 which is much more performant for graphics and audio:
+
+	wsl --set-version Ubuntu 2
 
 ## Step 2: Java run-time
 
@@ -60,7 +69,7 @@ The generated JAR file will be located in the `lwjgl3/build/libs/` folder and co
 
 Since this is a fresh install of Ubuntu, java will not be available. 
 If you type the java command in the shell you will get an error message because it cannot be found.
-We need to install a Java run-time environment. 
+We need to install a Java run-time environment. Note: we are only using the Linux environment for testing, not for development so we don't need thee Java development kit (JDK).
 
 The following command in the Linux terminal installs the default JRE:
 
@@ -163,7 +172,7 @@ Now to install the desktop environment, in this case xfce4 and some related tool
 Follow the instructions from the video to change some configuration. We make a backup of the configuration file just in case and
 then use `sed` (stream editor) to find and replace some strings in the file.  Alternatively, you could make these changes in an editor by hand.
 The changes are to modify the port number for the windows server to 3390 (we will see this again later) 
-and to set the bits per pixel to 128 which is supposed to improve performance.
+and to set the bits per pixel to the value 128 which is supposed to improve performance.
 
 	$ cd /etc/xrdp
 	$ sudo cp xrdp.ini xrdp.ini.bak
@@ -192,6 +201,11 @@ At this point a new window should open with a desktop environment.
 
 ## Testing a LibGDX application
 
+On the desktop environment, you have some applications available via the menu, such as a File manager and Web Browser and a Terminal Emulator.  You can also rightclick 
+on the desktop for a context menu or use the icon bar at the bottom of the screen.
+
+Note: if selecting Terminal Emulator doesn't open a command window, make sure that under Settings/Default Application the default Terminal Emulator is set to `Xfce Terminal`.
+
 Open a terminal window in the linux desktop, and change directory (`cd`)to where the fat jar file is (your project's `lwjgl3/build/libs/` folder).  
 Note that you have access to your Windows file system via directories `/mnt/c` for the C:\ drive, `/mnt/d` for the D:\ drive, etcetera. 
 Alternatively, you can also use the graphical file manager to copy the jar file to your home directory and work from there.
@@ -206,16 +220,8 @@ and hey presto! The LibGDX application should open in a new window within the xf
 
 We have found an easy way to test if your LibGDX application works in a Linux environment, without the need for a separate computer or dual-booting.
 Because the Linux environment appears within a Windows window, it is fast to switch between the operation systems.  For example, to build the application 
-using IntelliJ IDEA under Windows and then switching to the xfce4 desktop to run it.  
+using your Java development environment under Windows and then switching to the xfce4 desktop to run it.  
 
-The frame rate may be a lot lower than on Windows but this may depend on your game.
 
-More importantly there is no sound.  The following errors appear in the console.
 
-	[ALSOFT] (EE) Failed to connect PipeWire event context (errno: 112)
-	shared memfd open() failed: Function not implemented
-	error: XDG_RUNTIME_DIR is invalid or not set in the environment.
-
-Surprisingly, there seems to be a general problem to have audio under WSL.  
-Some suggestions on-line are to forward audio to a pulseaudio server running on Windows, but so far I did not get this to work. So to test audio, you may still need to run it on a Linux box.
 
