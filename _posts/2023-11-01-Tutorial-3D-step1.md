@@ -37,13 +37,14 @@ a runnable version of the app.
 - [step 17: head bobbing](https://monstroussoftware.github.io/2023/11/17/Tutorial-3D-step17.html)
 - [step 18: full screen mode](https://monstroussoftware.github.io/2023/11/18/Tutorial-3D-step18.html)
 - [step 19: navigation mesh](https://monstroussoftware.github.io/2023/11/19/Tutorial-3D-step19.html)
+- [step 20: framerate independence](https://monstroussoftware.github.io/2023/11/20/Tutorial-3D-step20.html)
+- [step 21: navigation mesh generation](https://monstroussoftware.github.io/2024/05/21/Tutorial-3D-step21.html)
 
 
 ## Prerequisites
 You'll need an IDE (integrated development environment). I would recommend IntelliJ IDEA. The community version is free and is more than sufficient for this project.
 
 To view or edit the 3d models, you can use Blender which is free to download from [Blender.org](https://blender.org).
-
 
 ## Step 1 - Lift off
 
@@ -58,7 +59,7 @@ A window pops up, asking for details of the project you want to build. There are
 will generate the project outline for us.
 
 In the main screen we fill in:
-- the name of the project: 'TutorialFPS'
+- the name of the project: 'Tut3D'
 - a package identifier, for example 'com.yourcompany.yourgame'
 - the name of the main class. I tend to just call it 'Main' for ease of reference.
 
@@ -89,7 +90,7 @@ Press the button 'Generate'. The tool will now create a project directory which 
 Double-click on build.gradle. Or alternatively, open IntelliJ IDEA and use File/Open to open build.gradle.
 If IntelliJ asks to open build.gradle as file or as project, answer 'as project'.
 
-Once IntelliJ has opened the project it will automatically start running some Gradle tasks and download the necessary libraries.
+Once IntelliJ has opened the project it will automatically start running some Gradle tasks and download the necessary libraries. 
 This will take a little while.
 
 Open the Gradle menu on the right hand side. Navigate to TutorialFPS/lwjgl3/tasks/application and double-click on the run icon.
@@ -155,7 +156,7 @@ The environment is defined to add some lighting: some ambient light and a direct
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 ```
 
-We'll define a box to act as ground level.  Let's load an image to be used as a texture.
+We'll define a box to act as ground level.  Let's load an image to be used as a texture. 
 We use a TextureRegion to scale it to repeat ten times across the model.
 
 ```java
@@ -170,8 +171,8 @@ We use a TextureRegion to scale it to repeat ten times across the model.
 Now we'll use ModelBuilder to create a model for the ground.
 The model is just a simple box measuring 100 by 100 in width and depth and 1 in height.
 We apply the texture that we just loaded as the diffuse texture.
-Then we indicate that for each vertex of the model, we'll need a position,
-a normal vector which is important for lighting and the texture coordinates because we
+Then we indicate that for each vertex of the model, we'll need a position, 
+a normal vector which is important for lighting and the texture coordinates because we 
 are applying a texture on the model.
 
 ```java
@@ -184,12 +185,12 @@ are applying a texture on the model.
 ```
 
 Now that we have a model we can create a ModelInstance from it.  This is an instantiation of the
-model in a particular position. In this case we will only make one model instance
-and place it at (0,-1,0) so that the top of the box is exactly at Y=0 which we'll use as a
-convenient ground level.
+model in a particular position. In this case we will only make one model instance 
+and place it at (0,-1,0) so that the top of the box is exactly at Y=0 which we'll use as a 
+convenient ground level. 
 
-Although, we only have one instance in this case it is handy to use an array of
-ModelInstance in case we want to add more instances later.
+Although, we only have one instance in this case it is handy to use an array of 
+ModelInstance in case we want to add more instances later.  
 
 ```java
         // create and position model instances
@@ -213,7 +214,7 @@ Now let's get to the rendering itself. First let's declare a constant for the ba
 ```
 
 The render() method of the GameScreen will be called for each frame, typically 60 times per second.
-We use it to render the screen contents, but we also use it to update whatever is happening
+We use it to render the screen contents, but we also use it to update whatever is happening 
 in the game. For example, here we call the update method of the camera controller to let the camera
 respond to mouse movements and key presses.
 
@@ -248,7 +249,7 @@ The resize() method is used to update the camera viewport in case the window siz
 On leaving the game screen, either because you close the application or you are switching to another screen, the hide() method is called.  
 This is the opportunity to tidy up and dispose some objects we've created to avoid memory leaks.
 If you're not sure what needs to be disposed, check if the object class has a dispose() method.
-For example, you need to dispose each Model, but not a ModelInstance.
+For example, you need to dispose each Model, but not a ModelInstance. 
 You need to dispose ModelBatch, but not the PerspectiveCamera.
 
 ```java
@@ -272,7 +273,7 @@ Create or download a ground texture, e.g. this one created by Katsukagi which is
 Replace the texture filename in the code as needed.
 
 After all this code, we should now have a very basic 3d scene: we appear to be standing on a texture box that is floating in space.
-You can use the mouse to change the view (hold down left or right mouse button) and the WASD keys to move around, albeit in a rather clumsy manner.
+You can use the mouse to change the view (hold down left or right mouse button) and the WASD keys to move around, albeit in a rather clumsy manner. 
 You can use the mouse wheel to zoom.
 
 
@@ -291,8 +292,8 @@ Increase the size of the window to a size you're comfortable with, it depends a 
 
 ## TeaVM launcher
 
-To test the web version of this demo, go to the Gradle window in IntelliJ, select teavm/Tasks/application/runRelease.
-This will compile the code and start up a local web server. If the code compiles successfully, you will see a link to the web server among the compiler messages in the Run window:
+To test the web version of this demo, go to the Gradle window in Intellij, select teavm/Tasks/other/run.
+This will compile the code and start up a local web server. If the code compiles sucesfully, you will see a link to the web server among the compiler messages in the Run window:
 http://localhost:8080.   Click on that link in the Run window to see the demo in a web browser.
 
 Probably you want the demo to fill the browser screen, so change the config width and height to zero in TeaVMLauncher to use all available space. We also activate anti-aliasing:
