@@ -9,7 +9,7 @@ We will add both by making use of a physics library.  There are multiple physics
 However, we will make use of the ODE4j library, which is a conversion of the ODE physics library to Java. and also available to use in a web version of your game. 
 The manual for ODE can be found at [ode.org](https://ode.org/wiki/index.php/Manual).
 
-In particular, we will make use of the library [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) by AntzGames. 
+In particular, we will make use of the library [gdx-ode4j](https://github.com/MonstrousSoftware/gdx-ode4j) by AntzGames. 
 It is not a standard extension, we will need to follow the instructions on the gdx-ode4j page to integrate it into our project:
 
 Open the file `build.gradle` in the `core` module of our project. This file defines what dependencies the core module of our project has on external libraries. 
