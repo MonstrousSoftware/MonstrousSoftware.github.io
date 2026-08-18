@@ -22,7 +22,7 @@ Add a line to include the latest version of gdx-ode4j:
         dependencies {
             api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
             api "com.badlogicgames.gdx:gdx:$gdxVersion"
-            api "com.github.antzGames:gdx-ode4j:master-SNAPSHOT"                    // <------ add this line
+            api "com.github.MonstrousSoftware:gdx-ode4j:master-SNAPSHOT"                    // <------ add this line
             api "com.github.mgsx-dev.gdx-gltf:gltf:$gdxGltfVersion"                 
             api "de.golfgl.gdxcontrollerutils:gdx-controllerutils-mapping:$controllerMappingVersion"
             api "de.golfgl.gdxcontrollerutils:gdx-controllerutils-scene2d:$controllerScene2DVersion"
