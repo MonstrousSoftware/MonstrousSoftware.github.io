@@ -9,7 +9,7 @@ We will add both by making use of a physics library.  There are multiple physics
 However, we will make use of the ODE4j library, which is a conversion of the ODE physics library to Java. and also available to use in a web version of your game. 
 The manual for ODE can be found at [ode.org](https://ode.org/wiki/index.php/Manual).
 
-In particular, we will make use of the library [gdx-ode4j](https://github.com/antzGames/gdx-ode4j) by AntzGames. 
+In particular, we will make use of the library [gdx-ode4j](https://github.com/MonstrousSoftware/gdx-ode4j) by AntzGames. 
 It is not a standard extension, we will need to follow the instructions on the gdx-ode4j page to integrate it into our project:
 
 Open the file `build.gradle` in the `core` module of our project. This file defines what dependencies the core module of our project has on external libraries. 
@@ -148,6 +148,8 @@ The main simulation loop is the following:
                 contactgroup.empty();
             }
 ```
+> Note: see tutorial step 20 to see what is wrong with this code.
+
 The first line will test for collisions of all the geoms in the space. For any pair of potential colliding geoms, the callback function is called. The callback function will check if the shapes are indeed colliding and if so create a contact joint for each contact between the two geoms.
 The second line will advance all the rigid bodies for one time step, applying all the velocities, forces and torques to calculate their new position, orientation and velocities.  
 ODE works best with a fixed time step, so we don't use deltaTime here. We will need to copy the new positions and orientations to the game objects before rendering. 

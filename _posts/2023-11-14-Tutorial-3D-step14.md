@@ -104,8 +104,8 @@ In the class GameScreen we will add a ScopeOverlay object, and we add a boolean 
         }
 ```
 
-We add a private method to check if we can actually look through the scope or not. This is only possible if the right mouse button is down and the player is holding a gun and we are in first person view.
-If we are in scope mode we set the camera field of view to 20 degrees for a zoomed in look.
+We add a private method to check if we can actually look through the scope or not. There are a few conditions for the scope view: the right mouse button is held down, the player is holding a gun, and we are in first person view.
+If we are indeed in scope mode we set the camera field of view to 20 degrees for a zoomed in look.
 
 ```java
         private void setScopeMode( boolean scopeView ){
@@ -124,7 +124,7 @@ If we are in scope mode we set the camera field of view to 20 degrees for a zoom
 ```
 
 The `render()` method is adapted to call the `setScopeMode()` method and to render the scope overlay if needed.
-We also hid teh gun view and the crosshair if we are in scope mode.
+We also hide the gun view and the cross-hair if we are in scope mode.
 When we fire a bullet we call `ScopeOverlay.startRecoilEffect()` for a little animation effect.
 
 ```java

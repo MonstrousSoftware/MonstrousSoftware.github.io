@@ -56,7 +56,7 @@ GameScreen:
     }
 ```
 
-To calculate the player's velocity we add a new method to the PhysicsBody class which converts the linearVelocity 
+To calculate the player's velocity we add a new method to the PhysicsBody class which converts the linear velocity 
 of the rigid body to a Vector3.
 
 PhysicsBody:

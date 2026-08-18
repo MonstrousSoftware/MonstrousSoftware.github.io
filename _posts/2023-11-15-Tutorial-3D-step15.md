@@ -18,8 +18,21 @@ to the rigid body.  This offset rotation is set with `geom.setOffsetQuaternion()
 If we apply this, we can use "Y is up" also in the physics code and the conversion between ODE vectors and LibGDX vectors become much more straightforward, and we don't have 
 to swap Z and -Y coordinates anymore (with lots of chance for errors).
 
-To do this, add the following code to `PhysicsBody.createBody`. In case the geometry shape is a cylinder or capsule, create a quaternion
-to define a 90-degree rotation around the X axis.  This will change the Z alignment to a Y alignment. 
+To change the ODE coordinate system, go to `PhysicsWorld.reset` and change the following lines 
+```java
+       space = OdeHelper.createSapSpace( null, DSapSpace.AXES.XYZ );           
+       world.setGravity (0, 0, Settings.gravity); 
+```
+to the following:
+```java
+        space = OdeHelper.createSapSpace( null, DSapSpace.AXES.XZY );
+        world.setGravity (0,  Settings.gravity, 0); 
+```
+From now on, ODE uses the same coordinate system as LibGDX and OpenGL, i.e. Y is up.
+
+
+To make the collision shapes also be aligned to the up axis, add the following code to `PhysicsBody.createBody`. In case the geometry shape is a cylinder or capsule, create a quaternion
+to define a 90-degree rotation around the X axis.  This will change the Z alignment to a Y alignment. For the other geometry shapes such as sphere or box, this is not needed because they are symmetrical.
 ```java
             if(shapeType == CollisionShapeType.CYLINDER || shapeType == CollisionShapeType.CAPSULE) {
                 // rotate geom 90 degrees around X because ODE geom cylinders and capsules shapes are created using Z as long axis
@@ -28,6 +41,7 @@ to define a 90-degree rotation around the X axis.  This will change the Z alignm
                 geom.setOffsetQuaternion(Q);    // set standard rotation from rigid body to geom
             }
 ```
+
 Then everywhere we convert between ODE vectors and LibGDX vectors (mostly in PhysicsBody, PhysicsBodyFactory and PhysicsRayCaster) 
 we can use the same order of x, y and z and we don't have to add minus signs anywhere. For example, in the PhysicsBody class:
 ```java
@@ -115,8 +129,8 @@ ODE allows to define a shape for the distribution of mass, which can give a more
 (To be fair, the difference is rather subtle, and this change is entirely optional).
 For example, for a spherical mass we use `massInfo.setSphere(1, radius)` where 1 is arbitrarily used as mass density.  
 If we assume all game objects have the same mass density, we can let the 
-mass be automatically calculated from the shape and its size.  This automatically means that larger objects will be heavier than smaller ones. It also means
-we no longer have to define a mass for every object we create.  Note that we will need to tweak the force values as this changes the mass of the various objects.
+mass be automatically calculated from the shape and its size.  This means that larger objects will be heavier than smaller ones.
+We now no longer have to define a mass for every object we create.  Note that we will need to tweak the force values as this changes the mass of the various objects.
 
 Here is the new version of `createBody` using mass derived from the shape and the offset rotation we discussed earlier:
 
