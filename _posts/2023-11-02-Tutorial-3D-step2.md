@@ -18,7 +18,7 @@ And change the initialisation in show() to the following:
 ```java
         camController = new FirstPersonCameraController(cam);
 ```
-Add the following to show() to catch the mouse cursor. 
+Add the following to show() to catch the mouse cursor, i.e. to hide it and keep it inside the game window. 
 ```java
         // hide the mouse cursor and fix it to screen centre, so it doesn't go out the window canvas
         Gdx.input.setCursorCatched(true);
