@@ -198,7 +198,7 @@ In the GameScreen class replace `FirstPersonCameraController` by our new `CamCon
 camera controller's update method:
 ```java
         // update
-        camController.update(Gdx.graphics.getDeltaTime());
+        camController.update(delta);
 ```
 At this point the code should compile, and you can guide the camera around with the WASD keys, 
 and turn with the Q and E keys.
