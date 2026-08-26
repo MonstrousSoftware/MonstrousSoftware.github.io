@@ -178,6 +178,7 @@ This is the file we load with the line we saw earlier:
 ```
 The GLTF format is a standard format to exchange 3d models between different software products.
 Windows 10 and Windows 11 have a standard 3D viewer that allows you to view GLTF files, just by clicking on them.
+(Note: Microsoft has retired this app and suggests using [this online tool](https://sandbox.babylonjs.com/) instead).
 
 ![3dviewer.png](/assets/images/3dviewer.png)
 
@@ -186,7 +187,7 @@ Windows 10 and Windows 11 have a standard 3D viewer that allows you to view GLTF
 ## Conclusion
 You should now be able to run the program.  Again we can walk over a large texture block.  
 Now the block is imported from an external file though instead of built by our code.  This opens up the avenue
-to use far more complicated models.  Also animated models are supported.
+to use far more complicated models.  
 
 Using the gdx-gltf extension also upgrades the default libGDX shader to PBR (physically based rendering) shaders.
 This allows much more realistic materials, including metallic effects, reflectiveness, etcetera.
