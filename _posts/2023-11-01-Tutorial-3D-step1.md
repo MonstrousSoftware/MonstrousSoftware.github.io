@@ -6,8 +6,8 @@ In this tutorial series we are going to build a basic first-person shooter using
 
 This will be a 3d single player game. 
 We will be targeting the desktop version and a web version using the gdx-teavm extension.
-We'll load 3d assets using the GLTF file format, and we'll see how we can export assets from modeling software such as Blender.
-We will add physics using the gdx-ode4j extension.
+We will use the extension gdx-gltf to load 3d assets using the GLTF file format, and we'll see how we can export assets from modeling software such as Blender.
+We will add physics using the ODE4j library.
 
 This will not be a polished game, you can try it out on [itch.io](https://monstrous-software.itch.io/fps-demo) now if you want.
 The idea is to show how you can develop a 3d game using LibGDX and some of the popular extensions.
@@ -42,7 +42,7 @@ a runnable version of the app.
 
 
 ## Prerequisites
-You'll need an IDE (integrated development environment). I would recommend IntelliJ IDEA. The community version is free and is more than sufficient for this project.
+You'll need an IDE (integrated development environment). I would recommend [IntelliJ IDEA](https://www.jetbrains.com/idea/) by JetBrains. The community version is free and is more than sufficient for this project.
 
 To view or edit the 3d models, you can use Blender which is free to download from [Blender.org](https://blender.org).
 
@@ -51,11 +51,13 @@ To view or edit the 3d models, you can use Blender which is free to download fro
 To build the initial framework of our project we'll use the tool `gdx-liftoff`.  This is a replacement for the classic `gdx-setup` tool.
 
 Download the latest version of gdx-liftoff from here: [https://github.com/libgdx/gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
-It comes in the form of a jar file with a name like `gdx-liftoff-<version>.jar`.
+It comes in the form of a jar file with a name like `gdx-liftoff-VERSION.jar`.
 
-Double-click on the jar file. If nothing happens, go to the command line and type: `java -jar gdx-liftoff-1.14.2.0.jar` (substitute the version you downloaded).
+Double-click on the jar file. If nothing happens, go to the command line and type: 
 
-A window pops up, asking for details of the project you want to build. There are a number of tabbed windows. We'll go through them one by one and then gdx-liftoff
+```    java -jar gdx-liftoff-VERSION.jar``` (substitute the version you downloaded).
+
+A window pops up, asking for details of the project you want to build. There are a number of screens. We'll go through them one by one and then gdx-liftoff
 will generate the project outline for us.
 
 In the main screen we fill in:
@@ -71,14 +73,14 @@ The web versions have some limitations though, so for this tutorial we'll mainly
 
 ![lift-off screen shot](/assets/images/liftoff-new1.png)
 
-Under the tab 'Extensions', select 'Controllers' for controller support.
+Under the tab 'Extensions', select 'Controllers' for controller support (we will get back to that in Step 16).
 
 Under 'Templates' select 'Game'.  This will make it easy to switch between different screens in our game, for example a menu screen and a game screen.
 
 Go to the 'Third party' tab and select 'ControllerMapping' and 'ControllerScene2D' for more controller support.
 Scroll down and select 'gdx-gltf' which we'll use to import 3d models and for Physics Based Rendering.
 
-On the last tab, select the latest LibGDX version.
+On the last tab, select the latest LibGDX version. It is recommended to choose Java version 21.
 Select 'Add GUI assets' in case we'll need some GUI elements and 'Add README'.
 
 Fill in the directory for the project.  You can either create an empty folder first and then navigate to it using the 'Browse' icon, or type in a name for the folder and press the 'Create Folder' button.
@@ -88,9 +90,9 @@ Press the button 'Generate'. The tool will now create a project directory which 
 ![](/assets/images/project-empty.png)
 
 Double-click on build.gradle. Or alternatively, open IntelliJ IDEA and use File/Open to open build.gradle.
-If IntelliJ asks to open build.gradle as file or as project, answer 'as project'.
+If IDEA asks to open build.gradle as file or as project, answer 'as project'.
 
-Once IntelliJ has opened the project it will automatically start running some Gradle tasks and download the necessary libraries. 
+Once IDEA has opened the project it will automatically start running some Gradle tasks and download the necessary libraries. 
 This will take a little while.
 
 Open the Gradle menu on the right hand side. Navigate to TutorialFPS/lwjgl3/tasks/application and double-click on the run icon.
@@ -103,7 +105,7 @@ At this point the project structure is created, and we need to start filling in 
 
 Rename the class FirstScreen.java to GameScreen.java.  This screen will be the most important one in the game because it is where the game is played. Later we can add screens like a main menu, a splash screen, an options screen, etcetera.
 
-To quickly rename a class in the Intellij IDE, right click FirstScreen.java in the Project view. Select Refactor and then rename.
+To quickly rename a class in the IDE, right click FirstScreen.java in the Project view. Select Refactor and then rename.
 This will rename the source file, the name of the class file and also the reference to the class in Main.java.
 
 In the GameScreen class, let's add some fields: a camera, a camera controller, an environment, a model, a texture, an array of ModelInstance and a ModelBatch.
@@ -292,7 +294,7 @@ Increase the size of the window to a size you're comfortable with, it depends a 
 
 ## TeaVM launcher
 
-To test the web version of this demo, go to the Gradle window in Intellij, select teavm/Tasks/other/run.
+To test the web version of this demo, go to the Gradle window in the IDE, select teavm/Tasks/other/run.
 This will compile the code and start up a local web server. If the code compiles sucesfully, you will see a link to the web server among the compiler messages in the Run window:
 http://localhost:8080.   Click on that link in the Run window to see the demo in a web browser.
 
