@@ -1,24 +1,24 @@
-# 3D Tutorial - Step 3 - GLTF support
+# 3D Tutorial - Step 3 - glTF support
 by Monstrous Software
 
 
-# Step 3 - GLTF support
+# Step 3 - glTF support
 
-In this step we will add support for the GLTF format so that we can import files from 3d modeling software such as Blender.
+In this step we will add support for the glTF format so that we can import files from 3d modeling software such as Blender.
 
-The GLTF file format is a more modern replacement for formats such as OBJ or FBX.  Many LibGDX tutorials use the FBX format.  This requires an extra step in your work flow, using the fbx-conv executable, to convert FBX to a file format that LibGDX can read (g3db or g3dj). GLTF gives better support for material properties (e.g. metallic or glossy surfaces) which allows you to have better looking models in your game.  And support for skeletal animation in FBX is very basic (unless the rig is very simple, your animation will get corrupted).
+The glTF file format is a more modern replacement for formats such as OBJ or FBX.  Many LibGDX tutorials use the FBX format.  This requires an extra step in your work flow, using the fbx-conv executable, to convert FBX to a file format that LibGDX can read (g3db or g3dj). glTF gives better support for material properties (e.g. metallic or glossy surfaces) which allows you to have better looking models in your game.  And support for skeletal animation in FBX is very basic (unless the rig is very simple, your animation will get corrupted).
 
 We use the gdx-gtlf extension to support import of this file format and to support rendering with PBR (physically based rendering) shaders.
 
 
 ## gdx-gtlf
 
-We will use the quick start example of the gdx-gltf project as example. You can find it here [GLTFQuickStartExample.java](https://github.com/mgsx-dev/gdx-gltf/blob/master/demo/core/src/net/mgsx/gltf/examples/GLTFQuickStartExample.java).
+We will use the quick start example of the gdx-gltf project as example. You can find it here [GLTFQuickStartExample.java](https://github.com/mgsx-dev/gdx-gltf/blob/master/demo/core/src/net/mgsx/gltf/examples/glTFQuickStartExample.java).
 
 The gdx-gltf extension introduces the SceneManager class.  This holds the camera, the rendering environment (lights, fog, etcetera) and all the objects to be rendered (called scenes).   We will add the objects (scenes) to the SceneManager using addScene() and call SceneManager.render() at each frame to display them on the screen.
 You can think of a Scene as equivalent to the ModelInstance we saw earlier.  It corresponds to one instance of a mesh at a specific position and with some specific orientation.
 The use of the SceneManager will replace the modelBatch and the instances array we used earlier. 
-The SceneAsset class is used to represent the content of a loaded GLTF file.
+The SceneAsset class is used to represent the content of a loaded glTF file.
 
 We'll need a lot of new fields in the GameScreen class:
 ```java
@@ -30,24 +30,35 @@ We'll need a lot of new fields in the GameScreen class:
         private Texture brdfLUT;
         private SceneSkybox skybox;
 ```
-In the show() method add the following code to create a SceneManager and to add the contents from a GLTF file to the SceneManager. 
+In the show() method add the following code to create a SceneManager and to add the contents from a glTF file to the SceneManager. 
 ```java
         sceneManager = new SceneManager();
-        sceneAsset = new GLTFLoader().load(Gdx.files.internal("models/step3.gltf"));
+        sceneAsset = new glTFLoader().load(Gdx.files.internal("models/step3.gltf"));
         Scene scene = new Scene(sceneAsset.scene);
         sceneManager.addScene(scene);
 ```
 
-This replaces the following code from step 1 where we loaded textures, created a model and created a modelInstance.
+This replaces the following code from step 2 where we loaded a texture, created models with the model builder and created a modelInstance and store it in an instances array.
 ```java
+        // lines to delete 
+        modelBatch = new ModelBatch();
+        
+        ModelBuilder modelBuilder = new ModelBuilder();
+        
+        // create model
+        cubeModel = modelBuilder.createBox(5f, 5f, 5f,
+                                                   new Material(ColorAttribute.createDiffuse(Color.GREEN)),
+        VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+        
+        // create model instance
+        cubeInstance = new ModelInstance(cubeModel, 0, 2.5f, 0);
+
         textureGround = new Texture(Gdx.files.internal("textures/Stylized_Stone_Floor_005_basecolor.jpg"), true);
         textureGround.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
         textureGround.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         TextureRegion textureRegion = new TextureRegion(textureGround);
         int repeats = 10;
         textureRegion.setRegion(0,0,textureGround.getWidth()*repeats, textureGround.getHeight()*repeats );
-
-        ModelBuilder modelBuilder = new ModelBuilder();
 
         // create models
         Model modelGround = modelBuilder.createBox(100f, 1f, 100f,
@@ -57,14 +68,14 @@ This replaces the following code from step 1 where we loaded textures, created a
         // create and position model instances
         instances = new Array<>();
         instances.add(new ModelInstance(modelGround, 0, -1, 0));	// 'table top' surface
-
-        modelBatch = new ModelBatch();
 ```
 Add the camera to the scene manager:
 ```java
         sceneManager.setCamera(cam);
 ```
 Now set up lighting and a skybox.  This is copied straight from the Quick Example code. DirectionalLightEx is a gdx-gltf extension of LibGDX's standard DirectionalLight. It mimics a light that is infinitely far away; it has no position, only a light direction.
+To provide better lighting and physical based rendering this code uses `IBLBuilder` to generate a number of environmental cube maps based on the position of the light source. One for diffuse light, one for specular light and one to use for reflections.  The latter we will also use as a skybox.
+These maps represent simple generic outdoor lighting from a single light source.  More sophisticated lighting can be generated from so-called HDRi maps, as you can find on [Poly Haven](https://polyhaven.com/hdris) for example.
 ```java
         // setup light
         DirectionalLightEx light = new DirectionalLightEx();
@@ -94,7 +105,8 @@ Now set up lighting and a skybox.  This is copied straight from the Quick Exampl
 ```
 This replaces the previous code from step 1:
 ```java
-        environment = new Environment();
+        // lines to delete 
+        environmental = new Environment();
         environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.6f, 0.6f, 0.6f, 1f));
         environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 ```
@@ -102,6 +114,7 @@ This replaces the previous code from step 1:
 Now in the `render()` method we replace the use of modelBatch by calling scene manager's `render()` method.
 Instead of this:
 ```java
+        // lines to delete
         modelBatch.begin(cam);
         modelBatch.render(instances, environment);
         modelBatch.end();
@@ -114,6 +127,7 @@ we now use this:
 In the `resize()` method we can replace the following code:
 
 ```java
+        // lines to delete 
         cam.viewportWidth = width;
         cam.viewportHeight = height;
         cam.update();
@@ -141,7 +155,7 @@ And in the `dispose()` method we now have a lot of disposing to do:
 
 We can get rid of fields `environment`, `modelGround`, `textureGround`, `instances` and `modelBatch` because they are no longer used.
 
-To run the programme add the supplied files in the assets\models directory: `step3.gltf`, `step3.bin` and the `textures` subdirectory.
+To run the programme add the supplied files (see the GitHub repo) in the assets\models directory: `step3.gltf`, `step3.bin` and the `textures` subdirectory.
 
 When we run the programme, we may notice some clipping when we look down because the camera's near clipping plane is too far.
 In method show(), modify the near distance from 1 to 0.1f:
@@ -160,7 +174,7 @@ Install Blender from [blender.org](blender.org) and open up the included Blender
 
 You can see we created a box of 100 by 100 by 1 units in size and applied a texture to it.
 
-To export from Blender to the GLTF format use the following procedure:
+To export from Blender to the glTF format use the following procedure:
 
 1. Select the ground box object in Blender (or in general select all the objects you want to export)
 
@@ -174,10 +188,10 @@ To export from Blender to the GLTF format use the following procedure:
 
 This is the file we load with the line we saw earlier:
 ```java    
-    sceneAsset = new GLTFLoader().load(Gdx.files.internal("models/step3.gltf"));
+    sceneAsset = new glTFLoader().load(Gdx.files.internal("models/step3.gltf"));
 ```
-The GLTF format is a standard format to exchange 3d models between different software products.
-Windows 10 and Windows 11 have a standard 3D viewer that allows you to view GLTF files, just by clicking on them.
+The glTF format is a standard format to exchange 3d models between different software products.
+Windows 10 and Windows 11 have a standard 3D viewer that allows you to view glTF files, just by clicking on them.
 (Note: Microsoft has retired this app and suggests using [this online tool](https://sandbox.babylonjs.com/) instead).
 
 ![3dviewer.png](/assets/images/3dviewer.png)
