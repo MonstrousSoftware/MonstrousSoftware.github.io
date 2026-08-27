@@ -211,6 +211,10 @@ You need to dispose ModelBatch, but not the PerspectiveCamera.
     }
 ```
 
+An illustration of the perspective camera viewing the cube may clarify what we have set up now (the camera 'far' distance is not shown to scale):
+![scene overview](/assets/images/camview.png)
+
+
 Now that we have a camera, a model batch and a model instance, we can render the scene.  
 The `render` method of `GameScreen` will be called for each frame, typically 60 times per second.
 We use it to render the screen contents, but we also use it to update whatever is happening in the game. 
