@@ -8,7 +8,7 @@ In the previous step, we loaded a GLTF file with one single object in it: the gr
 
 Let us add some more items to the GLTF file and see how we can handle multiple objects.
 
-The file step4a.gtlf contains a few more objects.  You can see the file in Blender in the following picture.
+The file `step4a.gtlf` (download it from the GitHub repository) contains a few more objects.  You can see the file in Blender in the following picture.
 
 ![blender-step4a.png](/assets/images/blender-step4a.png)
 
@@ -84,74 +84,73 @@ The World class also keeps a reference to the game object that corresponds to th
 has changed since the previous frame. We can use this to resynchronize the game view as needed.
 ```java
     public class World implements Disposable {
-    
-        private final Array<GameObject> gameObjects;
-        public GameObject player;
-        private boolean isDirty;
-        private final SceneAsset sceneAsset;
-        
-        public World(String modelFileName) {
-            this.gameView = gameView;
-            gameObjects = new Array<>();
-            sceneAsset = new GLTFLoader().load(Gdx.files.internal(modelFileName));
-            for(Node node : sceneAsset.scene.model.nodes){  // print some debug info on the file contents
-                Gdx.app.log("Node ", node.id);
-            }
-            isDirty = true;
-        }
 
-        public boolean isDirty(){
-            return isDirty;
-        }
+    private final Array<GameObject> gameObjects;
+    public GameObject player;
+    private final SceneAsset sceneAsset;
+    private boolean isDirty;
 
-        private void clear() {
-            gameObjects.clear();
-            player = null;
-            isDirty = true;
-        }
+    public World(String modelFileName) {
 
-        public int getNumGameObjects() {
-                return gameObjects.size;
+        gameObjects = new Array<>();
+        sceneAsset = new GLTFLoader().load(Gdx.files.internal(modelFileName));
+        for(Node node : sceneAsset.scene.model.nodes){  // print some debug info
+            Gdx.app.log("Node ", node.id);
         }
-
-        public GameObject getGameObject(int index) {
-                return gameObjects.get(index);
-        }
-
-        private GameObject spawnObject(String name, Vector3 position){
-            Scene scene = new Scene(sceneAsset.scene, name);
-            if(scene.modelInstance.nodes.size == 0){
-                Gdx.app.error("Cannot find node in GLTF", name);
-                return null;
-            }
-            scene.modelInstance.transform.translate(position);
-            GameObject go = new GameObject(scene);
-            gameObjects.add(go);
-            isDirty = true;
-            return go;
-        }
-
-        public void removeObject(GameObject gameObject){
-            gameObjects.remove(gameObject, true);
-            isDirty = true;
-        }
-
-        public void update( float deltaTime ) {
-                // to be written 
-        }
-        
-        @Override
-        public void dispose() {
-            sceneAsset.dispose();
-        }
+        isDirty = true;
     }
+
+    public boolean isDirty(){
+        return isDirty;
+    }
+
+    public void clear() {
+        gameObjects.clear();
+        player = null;
+        isDirty = true;
+    }
+    public int getNumGameObjects() {
+        return gameObjects.size;
+    }
+
+    public GameObject getGameObject(int index) {
+        return gameObjects.get(index);
+    }
+
+    public GameObject spawnObject(String name, Vector3 position){
+        Scene scene = new Scene(sceneAsset.scene, name);
+        if(scene.modelInstance.nodes.size == 0){
+            Gdx.app.error("Cannot find node in GLTF", name);
+            return null;
+        }
+        scene.modelInstance.transform.translate(position);
+        GameObject go = new GameObject(scene);
+        gameObjects.add(go);
+        isDirty = true;
+        return go;
+    }
+
+    public void removeObject(GameObject gameObject){
+        gameObjects.removeValue(gameObject, true);
+        isDirty = true;
+    }
+
+    public void update( float deltaTime ) {
+        // to be written
+    }
+
+    @Override
+    public void dispose() {
+        sceneAsset.dispose();
+    }
+}
 ```
-In the above code, the spawnObject is used to create a scene corresponding to a node from the 
-file and position it with a specific offset from its original position.   If we use a zero offset
+In the above code, the `spawnObject` method is used to create a scene corresponding to a node from the 
+file and position it with a specific offset from its original position.   If we use a zero offset vector
 then it will appear in the same position as in the model file (i.e. where it was placed in Blender).  By providing a non-zero offset we can place
 a node in a different position. 
 
-You may also want to extend the spawnObject() method to not only give a position (translation) to each object 
+You may also want to extend the `spawnObject` method to not only give a position (translation) to each object 
 but also an orientation (rotation).  Internally, the position, orientation and the scale of a modelInstance 
 is stored as a transform matrix which is a 4 by 4 matrix.  The matrix can be manipulated through many methods. 
 For example, transform.translate( Vector3 v ) adds a translation (change of position) by vector v. As another example, 
@@ -162,98 +161,101 @@ The core of this new class will be the code we copied earlier from the gdx-gltf 
 
 Mostly this class can be written by moving lines of code out of GameScreen:
 ```java
-                public class GameView implements Disposable {
+ public class GameView implements Disposable {
 
-                    private final World world;                                // reference to World
-                    private final SceneManager sceneManager;
-                    private final PerspectiveCamera cam;
-                    private final Cubemap diffuseCubemap;
-                    private final Cubemap environmentCubemap;
-                    private final Cubemap specularCubemap;
-                    private final Texture brdfLUT;
-                    private final SceneSkybox skybox;
+    private final World world;                                // reference to World
+    private final SceneManager sceneManager;
+    private final PerspectiveCamera cam;
+    private final Cubemap diffuseCubemap;
+    private final Cubemap environmentCubemap;
+    private final Cubemap specularCubemap;
+    private final Texture brdfLUT;
+    private final SceneSkybox skybox;
 
-                    public GameView(World world) {
-                        this.world = world;
-                        sceneManager = new SceneManager();
-                
-                        cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(),  Gdx.graphics.getHeight());
-                        cam.position.set(0f, Settings.eyeHeight, 0f);
-                        cam.lookAt(0,Settings.eyeHeight,10);
-                        cam.near = near;
-                        cam.far = far;
-                        cam.update();
-                
-                        sceneManager.setCamera(cam);
-                
-                        // setup light
-                        DirectionalLightEx light = new DirectionalLightEx();
-                        light.direction.set(1, -3, 1).nor();
-                        light.color.set(Color.WHITE);
-                        light.intensity = 2f;
-                        sceneManager.environment.add(light);
-                                
-                        // setup quick IBL (image based lighting)
-                        IBLBuilder iblBuilder = IBLBuilder.createOutdoor(light);
-                        environmentCubemap = iblBuilder.buildEnvMap(1024);
-                        diffuseCubemap = iblBuilder.buildIrradianceMap(256);
-                        specularCubemap = iblBuilder.buildRadianceMap(10);
-                        iblBuilder.dispose();
-                
-                        // This texture is provided by the library, no need to have it in your assets.
-                        brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
-                
-                        sceneManager.setAmbientLight(0.1f);
-                        sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, brdfLUT));
-                        sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(specularCubemap));
-                        sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(diffuseCubemap));
-                        sceneManager.environment.set(new PBRFloatAttribute(PBRFloatAttribute.ShadowBias, 1f/512f)); // reduce shadow acne
-                
-                        // setup skybox
-                        skybox = new SceneSkybox(environmentCubemap);
-                        sceneManager.setSkyBox(skybox);
-                    }
-                                
-                    public PerspectiveCamera getCamera() {
-                        return cam;
-                    }
+    public GameView(World world) {
+        this.world = world;
+        sceneManager = new SceneManager();
 
-                    public void refresh() {
-                        sceneManager.getRenderableProviders().clear();        // remove all scenes
-                        
-                        // add scene for each game object
-                        int num = world.getNumGameObjects();
-                        for(int i = 0; i < num; i++){
-                                Scene scene = world.getGameObject(i).scene;
-                                sceneManager.addScene(scene);
-                        }
-                    }
+        cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(),  Gdx.graphics.getHeight());
+        cam.position.set(10f, Settings.eyeHeight, 5f);
+        cam.lookAt(0,Settings.eyeHeight,0);
+        cam.near = 0.1f;
+        cam.far = 300f;
+        cam.update();
 
-                    public void render( float delta ) {
-                        cam.update();
-                        if(world.isDirty())
-                            refresh();
-                        sceneManager.update(delta);
+        sceneManager.setCamera(cam);
 
-                        // render
-                        ScreenUtils.clear(Color.PURPLE, true);  // note clear color will be hidden by skybox anyway
-                        sceneManager.render();
-                    }
-                
-                    public void resize(int width, int height){
-                        sceneManager.updateViewport(width, height);
-                    }
-                
-                    @Override
-                    public void dispose() {
-                        sceneManager.dispose();
-                        environmentCubemap.dispose();
-                        diffuseCubemap.dispose();
-                        specularCubemap.dispose();
-                        brdfLUT.dispose();
-                        skybox.dispose();
-                    }
-                }
+        // setup light
+        DirectionalLightEx light = new net.mgsx.gltf.scene3d.lights.DirectionalShadowLight(Settings.shadowMapSize, Settings.shadowMapSize)
+                .setViewport(50,50,10f,100);
+        light.direction.set(1, -3, 1).nor();
+        light.color.set(Color.WHITE);
+        light.intensity = 3f;
+        sceneManager.environment.add(light);
+
+        // setup quick IBL (image based lighting)
+        IBLBuilder iblBuilder = IBLBuilder.createOutdoor(light);
+        environmentCubemap = iblBuilder.buildEnvMap(1024);
+        diffuseCubemap = iblBuilder.buildIrradianceMap(256);
+        specularCubemap = iblBuilder.buildRadianceMap(10);
+        iblBuilder.dispose();
+
+        // This texture is provided by the library, no need to have it in your assets.
+        brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
+
+        sceneManager.setAmbientLight(0.1f);
+        sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, brdfLUT));
+        sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(specularCubemap));
+        sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(diffuseCubemap));
+        sceneManager.environment.set(new PBRFloatAttribute(PBRFloatAttribute.ShadowBias, 1f/512f)); // reduce shadow acne
+
+        // setup skybox
+        skybox = new SceneSkybox(environmentCubemap);
+        sceneManager.setSkyBox(skybox);
+    }
+
+
+    public PerspectiveCamera getCamera() {
+        return cam;
+    }
+
+    public void refresh() {
+        sceneManager.getRenderableProviders().clear();        // remove all scenes
+
+        // add scene for each game object
+        int num = world.getNumGameObjects();
+        for(int i = 0; i < num; i++){
+            Scene scene = world.getGameObject(i).scene;
+            sceneManager.addScene(scene);
+        }
+    }
+
+    public void render(float delta ) {
+        cam.update();
+        if(world.isDirty())
+            refresh();
+
+        sceneManager.update(delta);
+
+        // render
+        ScreenUtils.clear(Color.PURPLE, true);  // note clear color will be hidden by skybox anyway
+        sceneManager.render();
+    }
+
+    public void resize(int width, int height){
+        sceneManager.updateViewport(width, height);
+    }
+
+    @Override
+    public void dispose() {
+        sceneManager.dispose();
+        environmentCubemap.dispose();
+        diffuseCubemap.dispose();
+        specularCubemap.dispose();
+        brdfLUT.dispose();
+        skybox.dispose();
+    }
+}
 ```
 
 
@@ -280,7 +282,7 @@ Here, for example, we spawn three ball object above each other: at (0,0,0), at (
 
 The Populator class does nothing but create objects in the world.  You can imagine this could be extended to read this data from an external file and then you could perhaps provide different files for different levels in your game.  For simplicity, we'll just use these hardcoded definitions for now.
 
-![](/assets/images/screenshot-4a2.png)
+![screenshot](/assets/images/screenshot-4a2.png)
 
 
 In GameScreen we create a private World object. We also create a private GameView object which is passed the World object in its constructor:
@@ -298,6 +300,7 @@ In the show() method of GameScreen we can create the game view and the game worl
 ```        
 and get rid of the following lines which are now covered in the World class or GameView class:
 ```java
+        // delete the following
         sceneAsset = new GLTFLoader().load(Gdx.files.internal("models/step4a.gltf"));
         Scene scene = new Scene(sceneAsset.scene);
         sceneManager.addScene(scene);
@@ -360,7 +363,7 @@ We have created some objects that should be disposed of, so make sure the GridVi
 ```
 Then in the GameScreen constructor create a GridView object, dispose of it in the `dispose()` method and add the following line at the end of the `render()` method:
 ```java
-        gridView.render(cam);
+        gridView.render(gameView.getCamera());
 ```
 This shows a reference grid and shows us the orientation of the world coordinate system (red, green, blue is X, Y, Z respectively).
 
@@ -381,7 +384,9 @@ by this code:
         DirectionalLightEx light = new net.mgsx.gltf.scene3d.lights.DirectionalShadowLight(Settings.shadowMapSize, Settings.shadowMapSize)
             .setViewport(50,50,10,100);
 ```
-This replaces a normal directional light by a directional light that also casts shadows.  
+This replaces a normal directional light by a directional light that also casts shadows.
+(note: the fully qualified class name is to prevent confusion with the LibGDX class of the same name.  We need the one
+from the gdx-gltf extension).
 The shadow quality often requires some tweaking of the parameters involved.
 
 
