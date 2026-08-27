@@ -14,7 +14,7 @@ The idea is to show how you can develop a 3d game using LibGDX and some of the p
 
 The development is shown as a number of steps, where every step we add something new (and sometimes we remove something old).
 There is a [github repository](https://github.com/MonstrousSoftware/Tut3D) which provides all the code corresponding to this tutorial and every step of this 
-tutorial is provided as a git tag.  Using the tags you can step through the history of the code. Each step results in 
+tutorial is provided as a release.  Using the release snapshots you can step through the history of the code. Each step results in 
 a runnable version of the app.
 
 ## Index
@@ -276,7 +276,7 @@ change the class definition from
 ``` 
  and get rid of those methods.
         
-If you want to compare the code we've written so far you can look at tag 'step-0.5' in the GitHub repository.
+If you want to compare the code we've written so far you can look at release 'step-0.5' in the GitHub repository.
 
 ## Beyond the Cube 
 
@@ -455,7 +455,7 @@ We can also activate anti-aliasing for the web version by going into `TeaVMLaunc
 
 ## Conclusions
 
-This concludes step 1. The code we've written so far is available as tag 'step-1' in the GitHub repository.
+This concludes step 1. The code we've written so far is available as release 'Step 1' in the GitHub repository.
 We've set up a project with gdx-liftoff. We've learnt about the perspective camera that is used to show a 3d view.  
 About models that represent the shape and texture of a 3d model and model instances that place a model
 somewhere in the game world. We've learnt that the model batch is used to render model instances.
