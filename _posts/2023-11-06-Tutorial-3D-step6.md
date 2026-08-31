@@ -17,7 +17,9 @@ We will add an extra boolean parameter to `spawnObject` to indicate if we should
 This parameter will determine if the method `applyNodeTransform` will make use of the node transform or not.
 Typically, for static objects we want to keep the node position and for dynamic objects we want to reset the node position.
 
-Make the following changes in the World class to `spawnObject` and `applyNodeTransform`;
+Make the following changes in the World class to `spawnObject` and `applyNodeTransform`. This adds an extra parameter that indicates if we;
+want to spawn the object at the position from the Blender file or at the position provided as another parameter.  This way we can do a lot of the level design
+by positioning objects such as walls in the 3d editing tool, but we still can spawn bullets where we like.
 
 ```java
         public GameObject spawnObject(boolean isStatic, String name, CollisionShapeType shape, boolean resetPosition, Vector3 position, float mass){        //<-- new param
@@ -39,7 +41,8 @@ Make the following changes in the World class to `spawnObject` and `applyNodeTra
         }
 ```
 
-Then we need to update the lines in the Populate class to set this extra parameter:
+Then we need to update the lines in the Populate class to set this extra parameter. It is set to false for the scenery objects but to true
+for the dynamic objects:
 
 ```java
         public static void populate(World world) {
@@ -55,8 +58,14 @@ Then we need to update the lines in the Populate class to set this extra paramet
             world.spawnObject(false, "ball", CollisionShapeType.SPHERE, true, new Vector3(-1,5,-2), 1f);
             world.spawnObject(false, "ball", CollisionShapeType.SPHERE, true, new Vector3(-2,6,-2), 1f);
     
-            world.player = world.spawnObject(false, "ducky",CollisionShapeType.CAPSULE, true, new Vector3(0,1,0), 1f);
+            world.player = world.spawnObject(false, "ducky",CollisionShapeType.CAPSULE, true, new Vector3(0,1,0), Settings.playerMass);
         }
+```
+
+And we add a new variable to the Settings class:
+
+```java
+    static public float playerMass = 1.0f;
 ```
 
 ## Spawning bullets
@@ -74,29 +83,33 @@ First, we'll add some methods to GameObject to get an object's position and forw
         }
     
         public Vector3 getDirection() {
-            direction.set(0,0,1);
-            direction.mul(body.getOrientation());
+            direction.set(Vector3.Z);
+            direction.mul(body.getBodyOrientation());
             return direction;
         }
 ```
-Also, add the following method to PhysicsBody to apply a force to a dynamic body. Note how we convert to ODE axes here by swapping y and z.
+
+The game object's direction is obtained by starting from a unit vector along the Z-axis and rotating (multiplying) that vector with the
+body's orientation.  (The Z-axis is the original forward axis of our model because we happened to model it this way, if your assets face another direction modify this as needed). This gives us the forward direction of the game object if we take into account the current orientation of the related rigid body.
+
+
+Also, add the following method to PhysicsBody to apply a force to a dynamic body. 
 ```java
         public void applyForce( Vector3 force ){
             DBody rigidBody = geom.getBody();
-            rigidBody.addForce(force.x, -force.z, force.y);  // swap -z & y
+            rigidBody.addForce(force.x, force.y, force.z);  
         }
 ```
-To let the player character fire projectiles, we create a new method in the World class called shootBall().  This calculates a spawn position, which is slightly in front of 
+To let the player character fire projectiles, we create a new method in the World class called shoot().  This calculates a spawn position, which is slightly in front of 
 the player character.  It spawns a bullet object and applies a force to it to make it move forward.
 ```java
         private final Vector3 dir = new Vector3();
         private final Vector3 spawnPos = new Vector3();
         private final Vector3 shootDirection = new Vector3();
     
-        public void shootBall() {
+        public void shoot() {
             dir.set( player.getDirection() );
             spawnPos.set(dir);
-            Vector3 p = player.getPosition();
             spawnPos.add(player.getPosition()); // spawn from 1 unit in front of the player
             GameObject ball = spawnObject(false, "ball", CollisionShapeType.SPHERE, true, spawnPos, Settings.ballMass );
             shootDirection.set(dir);        // shoot forward
@@ -108,36 +121,35 @@ the player character.  It spawns a bullet object and applies a force to it to ma
 We add the following to the Settings class. We can tweak this to make the projectiles heavier or faster:
 ```java
         static public float ballMass = 0.2f;
-        static public float ballForce = 100f;
+        static public float ballForce = 1500f;
 ```
-We call world.shootBall() from GameScreen whenever the F key is pressed.
+We call world.shoot() from GameScreen whenever the F key is pressed.
 ```java
         @Override
         public void render(float delta) {
             ...
             if (Gdx.input.isKeyJustPressed(Input.Keys.F))
-                world.shootBall();
+                world.shoot();
         }
 ```
 This will spawn a ball object just in front of the player character and give it a forward, slightly upward, impulse so that it moves up in an arc.
 
+To avoid too much jitter at low frame rates we will increase the physics update rate in `PhysicsWorld` from 40Hz to 200 Hz. 
 
-## Toggle debug view
+```java
+   public class PhysicsWorld implements Disposable {
+    static final float TIME_STEP = 1f/200f;  // fixed physics time step
+    //...
+```
+Note that changing this value affects the simulation, you may need to change force values or body masses to keep the same behaviour.
 
-Let us use a function key to toggle the debug view on and off.  In GameScreen add the following field: 
-```java
-        private boolean debugRender = false;
-```
-Add the following line to the `show()` method.  On the desktop version this is not required, but on the teavm web version this will allow to catch the F1 key without the browser intercepting it. (You need gdx-teavm version 1.0.0-b8 or newer for this to work.)
-```java
-        Gdx.input.setCatchKey(Input.Keys.F1, true); 
-```
-Then add the following code to the `render()` method:
+
+Then add the following code to the `render()` method to toggle debug mode with the F1 key:
 ```java
         if (Gdx.input.isKeyJustPressed(Input.Keys.F1))
             debugRender = !debugRender;
 ```
-And put the gridView and physicsView render calls inside a condition:
+And put the gridView and physicsView render calls inside a condition to only be called if we are in debug mode:
 ```
         if(debugRender) {
             gridView.render(gameView.getCamera());
@@ -161,6 +173,7 @@ Add the following constants to PhysicsBody:
 Then add the following lines to the `render()` method of PhysicsBody:
 ```java
         // use different colour for static/sleeping/active objects and for active ones
+        DGeom geom = body.geom;
         Color color = COLOR_STATIC;
         if (geom.getBody() != null) {
             if (geom.getBody().isEnabled())
@@ -168,7 +181,7 @@ Then add the following lines to the `render()` method of PhysicsBody:
             else
                 color = COLOR_SLEEPING;
         }
-        debugInstance.materials.first().set(ColorAttribute.createDiffuse(color));   // set material colour
+        body.debugInstance.materials.first().set(ColorAttribute.createDiffuse(color));   // set material colour
 ```
 These lines will modify the material colour of the debug ModelInstance depending on the body state:  
 - static objects (only a geom, no rigid body) are shown in gray
@@ -194,7 +207,7 @@ Replace the angular threshold with the following, to see the balls falling aslee
 In tutorial step 2 we developed a first person camera controller where we move the camera using the wasd keys.
 Rather than moving the camera, we're now going to make a controller to move a character in third person view.
 
-The class PlayerController implements a dynamic character controller. JamesTKhan has a youtube video here [https://www.youtube.com/watch?v=O0Deshj2-KU&ab_channel=JamesTKhan](https://www.youtube.com/watch?v=O0Deshj2-KU&ab_channel=JamesTKhan) describing this.
+The class PlayerController implements a dynamic character controller. JamesTKhan has a YouTube video here [https://www.youtube.com/watch?v=O0Deshj2-KU&ab_channel=JamesTKhan](https://www.youtube.com/watch?v=O0Deshj2-KU&ab_channel=JamesTKhan) describing this.
 Instead of changing the position of the player object directly, we will apply an impulse (a momentary force) on the corresponding rigid body.
 
 We use strong damping to make the character stop moving as soon as we let go of the keys. If we're simulating a car or a spaceship,
@@ -214,25 +227,11 @@ So to avoid, the player's capsule geom to tilt, we will lock it from any rotatio
         rigidBody.setMaxAngularSpeed(0);        // keep capsule upright by not allowing rotations
     }
 ```
-Call this method once on the player body on loading the level. 
+Call this method once on the player body on loading the level, e.g. in the `Populator` class or add a new method `setPlayer` in the `World` class as a convenient place to do this which also allows `player` to be a private member of `World`.
 
-A downside of not rotating the physics body is that the player character is visually always facing the same direction.  For this we make an exception in method `syncToPhysics` in the World class.
-For all the other game objects that are controlled by a rigid body, the ModelInstance transform is derived from the physics body.  For the player object, the ModelInstance rotation is taken from the PlayerController.
 
-```java
-    private void syncToPhysics() {
-        for(GameObject go : gameObjects){
-            if( go.body.geom.getBody() != null) {
-                go.scene.modelInstance.transform.set(go.body.getPosition(), go.body.getOrientation());
-            }
-        }
-        // the player model is an exception, use information from the player controller, since the rigid body is not rotated.
-        player.scene.modelInstance.transform.setToRotation(Vector3.Z, playerController.getForwardDirection());
-        player.scene.modelInstance.transform.setTranslation(player.body.getPosition());
-    }
-```
-
-The PlayerController class is then quite similar to the CamController class we developed earlier and which we can now replace.
+The PlayerController class is then quite similar to the CamController class we developed earlier and which we can now use instead (in `GameScreen` 
+set the input processor to the player controller instead of the camera controller, i.e. `Gdx.input.setInputProcessor(world.getPlayerController());`).
 
 ```java
     public class PlayerController extends InputAdapter  {
@@ -361,9 +360,9 @@ The PlayerController class is then quite similar to the CamController class we d
                 rotateView(-deltaTime * Settings.turnSpeed, 0);
     
             if (keys.containsKey(jumpKey) )
-                linearForce.y =  Settings.jumpForce;
+                linearForce.y =  deltaTime * Settings.jumpForce;
     
-            linearForce.scl(80);
+            linearForce.scl(2500);
             player.body.applyForce(linearForce);
             // note: as the player body is a capsule it is not necessary to rotate it
             // (and in fact it causes problems due to errors building up)
@@ -372,23 +371,73 @@ The PlayerController class is then quite similar to the CamController class we d
     }
 ```
 
+We add the following values to the `Settings` class:
+
+```java
+    static public float jumpForce = 10f;
+    static public float degreesPerPixel = 0.1f; // mouse sensitivity
+```
+
+and we modify the gravity value:
+
+```java
+    static public float gravity = 30f;
+```
+
+
 We define a PlayerController object as field of the World class and update it whenever the `World.update()` method is called.
 
-It is also a nice idea to update the `shootBall` method to make use of the viewingDirection to shoot the balls higher or lower depending on where you look.
+If you play around with this, you will notice that the player doesn't turn.  You may recall that the physics is based on a capsule and we decided not to rotate
+the corresponding rigid body.
+A downside of not rotating the physics body is that the player character is visually always facing the same direction. To solve this we make an exception in method `update` in the World class.
+For all the other game objects that are controlled by a rigid body, the ModelInstance transform is derived from the physics body.  For the player object, the ModelInstance rotation is taken from the PlayerController.
+
+```java
+    private void update() {
+        playerController.update(player, deltaTime);
+        physicsWorld.update(deltaTime);
+        for(GameObject go : gameObjects){
+            if( go.body.geom.getBody() != null) {
+                go.scene.modelInstance.transform.set(go.body.getPosition(), go.body.getOrientation());
+            }
+        }
+        // the player model is an exception, use information from the player controller, since the rigid body is not rotated.
+        player.scene.modelInstance.transform.setToRotation(Vector3.Z, playerController.getForwardDirection());
+        player.scene.modelInstance.transform.setTranslation(player.body.getPosition());
+    }
+```
+Recall you can rotate the player with the Q and E keys, whereas A and D are for strafing.
+
+
+It is also important to update the `shoot` method in `World` to make use of the viewingDirection to shoot the balls in the direction that the player is looking.
+
+```java
+    public void shoot() {
+        dir.set(playerController.getViewingDirection());
+        spawnPos.set(dir);
+        spawnPos.add(player.getPosition()); // spawn from 1 unit in front of the player
+        GameObject ball = spawnObject(false, "ball", CollisionShapeType.SPHERE, true, spawnPos, Settings.ballMass);
+        shootDirection.set(dir);        // shoot forward
+        shootDirection.y += 0.5f;       // and slightly up
+        shootDirection.scl(Settings.ballForce);   // scale for speed
+        ball.body.applyForce(shootDirection);
+    }
+```
+}
 
 ## New Camera Controller
 
 If we play around with the game so far, we'll quickly get annoyed by the fixed camera. The keyboard and mouse input are not used to control the player character in third person, but the view is now static.
 
-Next we will create a new camera controller, which is a more simplified version of the old one.  We don't control the camera anymore with keyboard and mouse, except that we can zoom with the scroll wheel of the mouse.
+Next we will change the camera controller to a more simplified version one.  We don't control the camera anymore with keyboard and mouse, except that we can zoom with the scroll wheel of the mouse.
 Since we originally started our project with a first person view, and somehow we arrived at a third person view, we will allow both options with our new camera controller: In first person view the camera will be 
 positioned at the player position and pointed along the player's view direction.  In third person view, the camera will be placed some distance behind and above the player and follow the player around Lara Croft style.
 
 ```java
-    public class CameraController extends InputAdapter {
+    public class CamController extends InputAdapter {
     
         private final Camera camera;
-        private boolean thirdPersonMode = false;
+        private boolean thirdPersonMode = true;
         private final Vector3 offset = new Vector3();
         private float distance = 5f;
     
@@ -439,7 +488,7 @@ positioned at the player position and pointed along the player's view direction.
     }
 ```
 
-Since the camera controller only controls the view of the game, not any objects in the world space, we can define the CameraController object as a field of the GameView class.  We add a getter for this object so that we can 
+Since the camera controller only controls the view of the game, not any objects in the world space, we can define the CamController object as a field of the GameView class.  We add a getter for this object so that we can 
 define both the camera controller and the player controller as input processors in `GameScreen.show()`:
 
 ```java
@@ -447,6 +496,32 @@ define both the camera controller and the player controller as input processors 
         Gdx.input.setInputProcessor(im);
         im.addProcessor(gameView.getCameraController());
         im.addProcessor(world.getPlayerController());
+```
+
+And we call the `CamController` update method from the `GameView` render method:
+
+```java
+        camController.update(world.getPlayer().getPosition(), world.getPlayerController().getViewingDirection());
+```
+
+Then in GameView.render() we allow the view to toggle from first to third person using the F2 key.  This method now looks as follows:
+
+```java
+    public void render(float delta ) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
+            boolean thirdPersonView = !camController.getThirdPersonMode();
+            camController.setThirdPersonMode(thirdPersonView);
+        }
+
+        camController.update(world.getPlayer().getPosition(), world.getPlayerController().getViewingDirection());
+        cam.update();
+        if(world.isDirty())
+            refresh();
+        sceneManager.update(delta);
+        
+        ScreenUtils.clear(Color.PURPLE, true);  // note clear color will be hidden by skybox anyway
+        sceneManager.render();
+    }
 ```
 
 
@@ -473,7 +548,7 @@ and update `GameView.refresh()` to include only scenes from visible game objects
 
 In PhysicsView we make a similar change, so that we don't draw the player capsule from inside.
 
-Then in GameView.render() we allow the view to toggle from first to third person using the F2 key.  This method now looks as follows:
+Then we modify the code we just added to toggle between first person and third person view to make the player invisible when needed:
 
 ```java
     public void render(float delta ) {
@@ -483,16 +558,8 @@ Then in GameView.render() we allow the view to toggle from first to third person
             world.getPlayer().visible = thirdPersonView;            // hide player mesh in first person
             refresh();
         }
-
-        camController.update(world.getPlayer().getPosition(), world.getPlayerController().getViewingDirection());
-        cam.update();
-        if(world.isDirty())
-            refresh();
-        sceneManager.update(delta);
-        
-        ScreenUtils.clear(Color.PURPLE, true);  // note clear color will be hidden by skybox anyway
-        sceneManager.render();
+        //...
     }
-```
-
+```      
+        
 This concludes step 6.

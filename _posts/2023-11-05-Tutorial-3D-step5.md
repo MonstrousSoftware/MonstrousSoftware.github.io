@@ -291,11 +291,6 @@ Active shapes will fall asleep if they have not moved for a while, which means f
 
 ```java
     public class PhysicsView implements Disposable {
-        // colours to use for active vs. sleeping geoms
-        static private final Color COLOR_ACTIVE = Color.GREEN;
-        static private final Color COLOR_SLEEPING = Color.TEAL;
-        static private final Color COLOR_STATIC = Color.GRAY;
-    
         private final ModelBatch modelBatch;
         private final World world;      // reference
     
@@ -316,17 +311,6 @@ Active shapes will fall asleep if they have not moved for a while, which means f
         private void renderCollisionShape(PhysicsBody body) {
             // move & orient debug modelInstance in line with geom
             body.debugInstance.transform.set(body.getPosition(), body.getBodyOrientation());
-    
-            // use different colour for static/sleeping/active objects and for active ones
-            Color color = COLOR_STATIC;
-            if (body.geom.getBody() != null) {
-                if (body.geom.getBody().isEnabled())
-                    color = COLOR_ACTIVE;
-                else
-                    color = COLOR_SLEEPING;
-            }
-            body.debugInstance.materials.first().set(ColorAttribute.createDiffuse(color));   // set material colour
-    
             modelBatch.render(body.debugInstance);
         }
     
