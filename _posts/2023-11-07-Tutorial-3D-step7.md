@@ -9,7 +9,7 @@ by Monstrous Software
 Up to now, we only support basic shapes for collision detection such as boxes, spheres, cylinders and capsules. What if we need a more complex shape?
 It is time to add a generic mesh shape where we will construct the collision geometry from the mesh of the ModelInstance.
 
-We're going to use a new GLTF file for this section and while we're at it let's use a settings variable for the file name. 
+We're going to use a new glTF file for this section and while we're at it let's use a settings variable for the file name instead of hard coding it in `GameScreen`: 
 
 Add the following to Settings:
 
@@ -77,12 +77,12 @@ Now let us create a method in PhysicsBodyFactory to construct a wire frame mesh 
 
         int numVertices = mesh.getNumVertices();
         int numIndices = mesh.getNumIndices();
-        int stride = mesh.getVertexSize()/4;        // floats per vertex in mesh, e.g. for position, normal, textureCoordinate, etc.
+        int stride = mesh.getVertexSize()/Float.BYTES;        // floats per vertex in mesh, e.g. for position, normal, textureCoordinate, etc.
 
         float[] origVertices = new float[numVertices*stride];
         short[] origIndices = new short[numIndices];
         // find offset of position floats per vertex, they are not necessarily the first 3 floats
-        int posOffset = mesh.getVertexAttributes().findByUsage(VertexAttributes.Usage.Position).offset / 4;
+        int posOffset = mesh.getVertexAttributes().findByUsage(VertexAttributes.Usage.Position).offset /Float.BYTES;
 
         mesh.getVertices(origVertices);
         mesh.getIndices(origIndices);
@@ -129,12 +129,12 @@ also reorder the indices of each triangle to reverse the winding. If we don't do
 
         int numVertices = mesh.getNumVertices();
         int numIndices = mesh.getNumIndices();
-        int stride = mesh.getVertexSize()/4;        // floats per vertex in mesh, e.g. for position, normal, textureCoordinate, etc.
+        int stride = mesh.getVertexSize()/Float.BYTES;        // floats per vertex in mesh, e.g. for position, normal, textureCoordinate, etc.
 
         float[] origVertices = new float[numVertices*stride];
         short[] origIndices = new short[numIndices];
         // find offset of position floats per vertex, they are not necessarily the first 3 floats
-        int posOffset = mesh.getVertexAttributes().findByUsage(VertexAttributes.Usage.Position).offset / 4;
+        int posOffset = mesh.getVertexAttributes().findByUsage(VertexAttributes.Usage.Position).offset /Float.BYTES;
 
         mesh.getVertices(origVertices);
         mesh.getIndices(origIndices);
@@ -144,9 +144,9 @@ also reorder the indices of each triangle to reverse the winding. If we don't do
         int[] indices = new int[numIndices];
 
         for(int v = 0; v < numVertices; v++) {
-            vertices[3*v] = origVertices[stride*v+posOffset];        // X := x
-            vertices[3*v+1] = -origVertices[stride*v+2+posOffset];   // Y := -z
-            vertices[3*v+2] = origVertices[stride*v+1+posOffset];    // Z := y
+            vertices[3*v] = origVertices[stride*v+posOffset];        
+            vertices[3*v+1] = origVertices[stride*v+1+posOffset];   
+            vertices[3*v+2] = origVertices[stride*v+2+posOffset];    
         }
         for(int i = 0; i < numIndices; i++)         // convert shorts to ints
             indices[i] = origIndices[i];
@@ -157,7 +157,7 @@ also reorder the indices of each triangle to reverse the winding. If we don't do
 
 With this code in place, we are able to use arbitrary meshes as collision shapes, for those cases when a box or a sphere is just not good enough.
 
-
+You can test this in the game by moving the player through the arch way and colliding against the arch's walls.  The collisions should correspond to the visual shape of the obstacle.
 
 ## Collision Proxy
 
@@ -167,7 +167,7 @@ This will make the collision testing more efficient. But also it will help to sm
 To do this we need to supply two node names: one for the complex object and one for the simplified object.  The complex object is what we'll be rendering and what the user will see.  The simplified 
 object is only used for collision detection and will never be seen in-game.
 
-![](/assets/images/collisionProxy.png)
+![collision proxy](/assets/images/collisionProxy.png)
 
 An example is shown in the image above. On the left is a model of a staircase. This model has 132 vertices (which is actually still very low poly). On the right is a simplification of the staircase as a basic slope which uses just 8 vertices in a nice garish colour just to emphasize it will never be seen in-game.
 You can imagine the efficiency benefit is more pronounced when we have super detailed models.
@@ -203,7 +203,7 @@ Both nodes are loaded as scene and transformed using the position parameter and 
 
 Add the following line to Populator to try this out by loading a staircase and a proxy node.
 
-        world.spawnObject(true, "arch", "archProxy", CollisionShapeType.MESH, false, Vector3.Zero, 1f);
+        world.spawnObject(true,"stairs", "stairsProxy",  CollisionShapeType.MESH, false, Vector3.Zero, 1f);
 
 For all the other lines in the `populate()` method, insert a `null` after the node name. Idem for the `spawnObject()` call in the `shootBall()` method.
 
@@ -211,5 +211,6 @@ Below we can see with the in-game debug view how the staircase is approximated b
 
 ![stairs](/assets/images/staircase.png)
 
+You can test it by steering the player onto the stairs.  Although visually you can see the steps, the player actually glides up a slope.
 
 This concludes step 7.
