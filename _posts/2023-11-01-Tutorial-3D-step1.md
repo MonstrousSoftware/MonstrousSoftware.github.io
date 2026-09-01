@@ -5,8 +5,8 @@ by Monstrous Software (updated August 2026)
 In this tutorial series we are going to build a basic first-person shooter using LibGDX.
 
 This will be a 3d single player game. 
-We will be targeting the desktop version and a web version using the gdx-teavm extension.
-We will use the extension gdx-gltf to load 3d assets using the GLTF file format, and we'll see how we can export assets from modeling software such as Blender.
+We will be targeting the desktop version and a web version (at least until we get to physics) using the gdx-teavm extension.
+We will use the extension gdx-gltf to load 3d assets using the glTF file format, and we'll see how we can export assets from modeling software such as Blender.
 We will add physics using the ODE4j library.
 
 This will not be a polished game, you can try it out on [itch.io](https://monstrous-software.itch.io/fps-demo) now if you want.
