@@ -519,8 +519,7 @@ Then in GameView.render() we allow the view to toggle from first to third person
 ```java
     public void render(float delta ) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
-            boolean thirdPersonView = !camController.getThirdPersonMode();
-            camController.setThirdPersonMode(thirdPersonView);
+            camController.setThirdPersonMode(!camController.getThirdPersonMode());
         }
 
         camController.update(world.getPlayer().getPosition(), world.getPlayerController().getViewingDirection());
@@ -540,10 +539,11 @@ One thing we'll quickly notice is when we switch to first person view, we get a 
 ![inside duck](/assets/images/inside-duck.png)
 
 Obviously, we should not render the player character in first person view. Let's add a boolean field called `visible` to GameObject to allow us to hide game objects
-and update `GameView.refresh()` to include only scenes from visible game objects:
+and update `GameView.refresh()` to include only scenes from visible game objects. We will make the player visible only in third person mode:
 
 ```java    
     public void refresh() {
+        world.player.visible = camController.getThirdPersonMode(); //<---------- new
         sceneManager.getRenderableProviders().clear();        // remove all scenes
 
         // add scene for each game object
@@ -558,18 +558,19 @@ and update `GameView.refresh()` to include only scenes from visible game objects
 
 In PhysicsView we make a similar change, so that we don't draw the player capsule from inside.
 
-Then we modify the code we just added to toggle between first person and third person view to make the player invisible when needed:
+Then we modify the code we just added to toggle between first person and third person view to call `refresh` when the viewing mode is toggled:
 
 ```java
+
     public void render(float delta ) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.F2)) {
-            boolean thirdPersonView = !camController.getThirdPersonMode();
-            camController.setThirdPersonMode(thirdPersonView);
-            world.getPlayer().visible = thirdPersonView;            // hide player mesh in first person
+            camController.setThirdPersonMode(!camController.getThirdPersonMode());
             refresh();
         }
         //...
     }
+
+
 ```      
         
 This concludes step 6.

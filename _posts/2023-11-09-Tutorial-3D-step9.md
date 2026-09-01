@@ -99,9 +99,9 @@ The balls are dynamic objects and the player has the player type.
             world.spawnObject(GameObjectType.TYPE_DYNAMIC, "ball", null, CollisionShapeType.SPHERE, true, new Vector3(-1,5,-2), Settings.ballMass);
             world.spawnObject(GameObjectType.TYPE_DYNAMIC, "ball", null, CollisionShapeType.SPHERE, true, new Vector3(-2,6,-2), Settings.ballMass);
     
-            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null, CollisionShapeType.BOX, true, new Vector3(-5, 1, 0), 1);
-            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null,  CollisionShapeType.BOX, true, new Vector3(5, 1, 15), 1);
-            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null, CollisionShapeType.BOX, true, new Vector3(-12, 1, 13), 1);
+            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null, CollisionShapeType.SPHERE, true, new Vector3(-5, 1, 0), 1);
+            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null,  CollisionShapeType.SPHERE, true, new Vector3(5, 1, 15), 1);
+            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null, CollisionShapeType.SPHERE, true, new Vector3(-12, 1, 13), 1);
             world.spawnObject(GameObjectType.TYPE_PICKUP_HEALTH, "healthpack",null, CollisionShapeType.BOX, true, new Vector3(26, 0.1f, -26), 1);
             world.spawnObject(GameObjectType.TYPE_PICKUP_HEALTH, "healthpack",  null, CollisionShapeType.BOX, true, new Vector3(-26, 0.1f, 26), 1);
 
@@ -111,7 +111,7 @@ The balls are dynamic objects and the player has the player type.
         }
 ```
 
-In the PhysicsWorld class we add a field for the game world (not to be confused with DWorld) and set it from the constructor.
+In the `PhysicsWorld` class we add a field for the game world (not to be confused with DWorld) and set it from the constructor.
 In the collision callback method we can now add a call to a new method `World.onCollision()` when two game objects collide.
 For this we use the data field of the geoms (which we set in the GameObject constructor specifically for this purpose) and cast them back to GameObject.
 
@@ -156,22 +156,23 @@ For this we use the data field of the geoms (which we set in the GameObject cons
         }
 ```
 
+Adapt the `World` class to update the construction of the physics world with the new parameter and to implement a method named `onCollision` which will be called when two game objects collide.
 
 The callback function checks the types of the collided object to determine if anything special needs to be done.  
-If one object is the player and the other object is a pickup, then it calls the pickup() method, which in this case will just delete the pickup object.
+If one object is the player and the other object is a pickup, then it calls the `pickup()` method, which in this case will just delete the pickup object.
 Note how we need to test the two input object in either order because we have no guarantee on which order the pair will be provided by the collision logic.
 
 ```java
         public class World implements Disposable {
             //...
-            
-            public void update( float deltaTime ) {
-                playerController.update(player, deltaTime);
-                physicsWorld.update(this);                                      // new parameter to pass this World object
-                syncToPhysics();
+
+            public World(String modelFileName) {
+                //...
+                physicsWorld = new PhysicsWorld(this);          // <-- add parameter
+                //...
             }
     
-           public void onCollision(GameObject go1, GameObject go2){             // called on collision
+            public void onCollision(GameObject go1, GameObject go2){             // called on collision
                 // try either order
                 handleCollision(go1, go2);
                 handleCollision(go2, go1);
