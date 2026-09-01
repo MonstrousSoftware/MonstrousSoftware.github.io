@@ -54,17 +54,18 @@ for the dynamic objects:
             world.spawnObject(true, "brickcube.002", CollisionShapeType.BOX,false, Vector3.Zero, 1f);
             world.spawnObject(true, "brickcube.003", CollisionShapeType.BOX,false, Vector3.Zero, 1f);
             world.spawnObject(true, "wall", CollisionShapeType.BOX,false, Vector3.Zero, 1f);
-            world.spawnObject(false, "ball", CollisionShapeType.SPHERE, true, new Vector3(0,4,-2), 1f);
-            world.spawnObject(false, "ball", CollisionShapeType.SPHERE, true, new Vector3(-1,5,-2), 1f);
-            world.spawnObject(false, "ball", CollisionShapeType.SPHERE, true, new Vector3(-2,6,-2), 1f);
+            world.spawnObject(false, "ball", CollisionShapeType.SPHERE, true, new Vector3(0,4,-2), Settings.ballMass);
+            world.spawnObject(false, "ball", CollisionShapeType.SPHERE, true, new Vector3(-1,5,-2), Settings.ballMass);
+            world.spawnObject(false, "ball", CollisionShapeType.SPHERE, true, new Vector3(-2,6,-2), Settings.ballMass);
     
             world.player = world.spawnObject(false, "ducky",CollisionShapeType.CAPSULE, true, new Vector3(0,1,0), Settings.playerMass);
         }
 ```
 
-And we add a new variable to the Settings class:
+And we add new variables to the Settings class:
 
 ```java
+    static public float ballMass = 0.2f;
     static public float playerMass = 1.0f;
 ```
 
@@ -118,27 +119,30 @@ the player character.  It spawns a bullet object and applies a force to it to ma
             ball.body.applyForce(shootDirection);
         }
 ```
-We add the following to the Settings class. We can tweak this to make the projectiles heavier or faster:
+
+We add the following to the Settings class to determine how hard we throw the ball:
 ```java
-        static public float ballMass = 0.2f;
-        static public float ballForce = 1500f;
+        static public float ballForce = 300f;
 ```
+
 We call world.shoot() from GameScreen whenever the F key is pressed.
 ```java
         @Override
         public void render(float delta) {
-            ...
+            //...
             if (Gdx.input.isKeyJustPressed(Input.Keys.F))
                 world.shoot();
+            //...
         }
 ```
 This will spawn a ball object just in front of the player character and give it a forward, slightly upward, impulse so that it moves up in an arc.
 
-To avoid too much jitter at low frame rates we will increase the physics update rate in `PhysicsWorld` from 40Hz to 200 Hz. 
+To avoid too much jitter we will set the physics update rate in `PhysicsWorld` from 40Hz to 60 Hz which is also a common monitor refresh frequency.
+If your monitor runs at 120 Hz, it will execute one physics time step every second frame. 
 
 ```java
    public class PhysicsWorld implements Disposable {
-    static final float TIME_STEP = 1f/200f;  // fixed physics time step
+    static final float TIME_STEP = 1f/60f;  // fixed physics time step
     //...
 ```
 Note that changing this value affects the simulation, you may need to change force values or body masses to keep the same behaviour.
@@ -218,7 +222,7 @@ However, it is a well-known issue in the ODE physics library, in fact it is ment
 axis will eventually cause the capsule to tilt sideways due to small errors accumulating. And if you try this with debug view on, you will see the player starting to tilt over after moving it around for a while.
 
 There are a number of solutions for this. Ours is relatively simple: from a collision detection point of view there is no need to rotate a capsule around its length axis since it is rotationally symmetric anyway.
-So to avoid, the player's capsule geom to tilt, we will lock it from any rotation by setting the maximum angular speed to zero. We''ll add a new method to the PhysicsBody class that sets the physics properties of the player body.  This is also the place to tweak the damping which will affect how quickly the player character will come to a stop in absence of keyboard input. And we also ensure the player object never goes to sleep mode.  
+To avoid the player's capsule geom to tilt, we will lock it from any rotation by setting the maximum angular speed to zero. We'll add a new method to the PhysicsBody class that sets the physics properties of the player body.  This is also the place to tweak the damping which will affect how quickly the player character will come to a stop in absence of keyboard input. And we also ensure the player object never goes to sleep mode.  
 ```java
     public void setPlayerCharacteristics() {
         DBody rigidBody = geom.getBody();
@@ -227,7 +231,7 @@ So to avoid, the player's capsule geom to tilt, we will lock it from any rotatio
         rigidBody.setMaxAngularSpeed(0);        // keep capsule upright by not allowing rotations
     }
 ```
-Call this method once on the player body on loading the level, e.g. in the `Populator` class or add a new method `setPlayer` in the `World` class as a convenient place to do this which also allows `player` to be a private member of `World`.
+Call this method once on the player body on loading the level, e.g. in the `Populator` class or add a new method `setPlayer` in the `World` class as a convenient place to do this.
 
 
 The PlayerController class is then quite similar to the CamController class we developed earlier and which we can now use instead (in `GameScreen` 
@@ -362,7 +366,7 @@ set the input processor to the player controller instead of the camera controlle
             if (keys.containsKey(jumpKey) )
                 linearForce.y =  deltaTime * Settings.jumpForce;
     
-            linearForce.scl(2500);
+            linearForce.scl(500);
             player.body.applyForce(linearForce);
             // note: as the player body is a capsule it is not necessary to rotate it
             // (and in fact it causes problems due to errors building up)
@@ -381,7 +385,7 @@ We add the following values to the `Settings` class:
 and we modify the gravity value:
 
 ```java
-    static public float gravity = 30f;
+    static public float gravity = -30f;
 ```
 
 
@@ -423,7 +427,13 @@ It is also important to update the `shoot` method in `World` to make use of the 
         ball.body.applyForce(shootDirection);
     }
 ```
-}
+
+
+```java
+    static public float ballMass = 0.2f;
+    static public float ballForce = 300f;
+```
+
 
 ## New Camera Controller
 
