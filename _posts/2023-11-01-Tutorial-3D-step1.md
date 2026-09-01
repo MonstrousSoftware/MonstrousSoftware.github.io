@@ -13,7 +13,7 @@ This will not be a polished game, you can try it out on [itch.io](https://monstr
 The idea is to show how you can develop a 3d game using LibGDX and some of the popular extensions.
 
 The development is shown as a number of steps, where every step we add something new (and sometimes we remove something old).
-There is a [github repository](https://github.com/MonstrousSoftware/Tut3D) which provides all the code corresponding to this tutorial and every step of this 
+There is a [github repository](https://github.com/MonstrousSoftware/Tut3D-2026) (updated August 2026) which provides all the code corresponding to this tutorial and every step of this 
 tutorial is provided as a release.  Using the release snapshots you can step through the history of the code. Each step results in 
 a runnable version of the app.
 
