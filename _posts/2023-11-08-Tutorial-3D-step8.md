@@ -25,13 +25,13 @@ a flat surface, but can have another value when we're stood on a slope.  If ther
         
             public PhysicsRayCaster(DSpace space) {
                 this.space = space;
-                groundRay = OdeHelper.createRay(1);        // length gets overwritten when ray is used
+                groundRay = OdeHelper.createRay(3);        // length gets overwritten when ray is used
             }
         
             public boolean isGrounded(GameObject player, Vector3 playerPos, float rayLength, Vector3 groundNormal ) {
                 this.player = player;
                 groundRay.setLength(rayLength);
-                groundRay.set(playerPos.x, playerPos.z, playerPos.y, 0, 0, -1); // swap Y & Z, point ray downwards 
+                groundRay.set(playerPos.x, playerPos.y, playerPos.z, 0, -1, 0); // point ray downwards 
                 groundRay.setFirstContact(true);
                 groundRay.setBackfaceCull(true);
         
@@ -50,14 +50,18 @@ a flat surface, but can have another value when we're stood on a slope.  If ther
                     DContactBuffer contacts = new DContactBuffer(N);
                     int n = OdeHelper.collide (o1,o2,N,contacts.getGeomBuffer());
                     if (n > 0) {
-                        if(o2 instanceof DRay )
-                            go = (GameObject)o1.getData();
+                        float sign = 1;
+                        if(o2 instanceof DRay ) {
+                            go = (GameObject) o1.getData();
+                            sign = -1f;
+                        }
                         else
-                            go = (GameObject)o2.getData();
+                            go = (GameObject) o2.getData();
                         if(go == player)      // ignore collision with player itself
                             return;
+
                         DVector3 normal = contacts.get(0).getContactGeom().normal;
-                        ((Vector3)data).set((float)normal.get(0), (float)normal.get(2), -(float)normal.get(1));	// swap Y&Z
+                        ((Vector3)data).set((float) (sign*normal.get(0)), (float)(sign*normal.get(1)), (float)(sign*normal.get(2)));	
                     }
                 }
             };
@@ -70,19 +74,52 @@ a flat surface, but can have another value when we're stood on a slope.  If ther
         }   
 ```
 
+Create a ray caster in the `World` class and pass it to the player controller:
+```java    
+    private final PhysicsRayCaster rayCaster;
+
+    public World(String modelFileName) {
+
+        gameObjects = new Array<>();
+        sceneAsset = new GLTFLoader().load(Gdx.files.internal(modelFileName));
+        for(Node node : sceneAsset.scene.model.nodes){  // print some debug info
+            Gdx.app.log("Node ", node.id);
+        }
+        isDirty = true;
+        physicsWorld = new PhysicsWorld();
+        rayCaster = new PhysicsRayCaster(physicsWorld);     // <-- new
+        factory = new PhysicsBodyFactory(physicsWorld);
+        playerController = new PlayerController(rayCaster); // <-- modified
+    }
+```
+
+Also dispose the ray caster in `World#dispose`.
 
 
-Now let's make use of this new method in the player controller.  We call the ray caster to check if we're on the ground.  If we are we check if we happen to be stood on a slope.
+
+Now let's make use of the ray caster in the player controller.  We call the ray caster to check if we're on the ground.  If we are we check if we happen to be stood on a slope.
 For this we calculate the dot product of the ground normal and the up vector.  The dot product gives us the cosine of the angle.  If the angle is very small, i.e. the surface under the player's feet is 
 almost horizontal, then the cosine will be close to 1.  If the cosine is less than one, it means we are standing on a slope.  To prevent the player capsule sliding down the slope, we temporarily
 disable gravity for the player.  This trick is explained in more detail in James T. Khan's video tutorial on [dynamic character controllers](https://www.youtube.com/watch?v=O0Deshj2-KU&list=PLjUR2MkQ0cuEda0_f-CoAZBowEN8gNSfJ) (note he is using the Bullet physics library instead).
 
+Add the following to `PlayerController`:
 
-
-```
+```java
+        private final PhysicsRayCaster rayCaster;
+        private final Vector3 groundNormal = new Vector3();
+     
+        public PlayerController(PhysicsRayCaster rayCaster)  {
+            this.rayCaster = rayCaster;
+            linearForce = new Vector3();
+            forwardDirection = new Vector3();
+            viewingDirection = new Vector3();
+            reset();
+        }
+        //...
+        
+        
         public void update (GameObject player, float deltaTime ) {
-            ...
-    
+   
             boolean isOnGround = rayCaster.isGrounded(player, player.getPosition(), Settings.groundRayLength, groundNormal);
             // disable gravity if player is on a slope
             if(isOnGround) {
@@ -90,6 +127,7 @@ disable gravity for the player.  This trick is explained in more detail in James
                 player.body.geom.getBody().setGravityMode(dot >= 0.99f);
             } else 
                 player.body.geom.getBody().setGravityMode(true);
+            //...
 ```
 
 The ray length needs to be chosen to stick out a little below the player's capsule. A reasonable value is defined in the Settings class, the value depends on the height of the character:
@@ -102,9 +140,9 @@ Likewise, we can allow jumping only when the character is stood on something.
 
 ```
         if (isOnGround && keys.containsKey(jumpKey) )
-            linearForce.y =  Settings.jumpForce;
+            linearForce.y =  deltaTime * Settings.jumpForce;
 ```
 
-
+Now that we've made these changes, the player can move up the staircase without sliding down and the player can only jump if they are stood on something.
 
 This concludes step 8. 
