@@ -99,9 +99,9 @@ The balls are dynamic objects and the player has the player type.
             world.spawnObject(GameObjectType.TYPE_DYNAMIC, "ball", null, CollisionShapeType.SPHERE, true, new Vector3(-1,5,-2), Settings.ballMass);
             world.spawnObject(GameObjectType.TYPE_DYNAMIC, "ball", null, CollisionShapeType.SPHERE, true, new Vector3(-2,6,-2), Settings.ballMass);
     
-            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null, CollisionShapeType.SPHERE, true, new Vector3(-5, 1, 0), 1);
-            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null,  CollisionShapeType.SPHERE, true, new Vector3(5, 1, 15), 1);
-            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null, CollisionShapeType.SPHERE, true, new Vector3(-12, 1, 13), 1);
+            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null, CollisionShapeType.BOX, true, new Vector3(-5, 1, 0), 0.1f);
+            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null,  CollisionShapeType.BOX, true, new Vector3(5, 1, 15), 0.1f);
+            world.spawnObject(GameObjectType.TYPE_PICKUP_COIN, "coin",  null, CollisionShapeType.BOX, true, new Vector3(-12, 1, 13), 0.1f);
             world.spawnObject(GameObjectType.TYPE_PICKUP_HEALTH, "healthpack",null, CollisionShapeType.BOX, true, new Vector3(26, 0.1f, -26), 1);
             world.spawnObject(GameObjectType.TYPE_PICKUP_HEALTH, "healthpack",  null, CollisionShapeType.BOX, true, new Vector3(-26, 0.1f, 26), 1);
 

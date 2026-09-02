@@ -319,11 +319,11 @@ It takes 25% health and removes the character when dead.
         }
 ```
 
-The shootBall() method needs a bit of updating, because the spawnObject() method has more parameters now. We also add a check to stop the 
+The shoot() method needs a bit of updating, because the spawnObject() method has more parameters now. We also add a check to stop the 
 player from shooting once they're dead:
 
 ```java
-        public void shootBall() {
+        public void shoot() {
             if(player.isDead())
                 return;
             dir.set( playerController.getViewingDirection() );
