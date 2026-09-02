@@ -43,8 +43,6 @@ some public field for commonly used assets, such as skin and font that we will u
             public Skin skin;
             public BitmapFont uiFont;
             public SceneAsset sceneAsset;
-            public Texture scopeImage;
-        
             private AssetManager assets;
         
             public Assets() {
@@ -66,9 +64,6 @@ some public field for commonly used assets, such as skin and font that we will u
                 assets.load("sound/secret1.ogg", Sound.class);
                 assets.load("sound/upgrade1.ogg", Sound.class);
                 assets.load("sound/9mm-pistol-shoot-short-reverb-7152.mp3", Sound.class);
-        
-        
-                assets.load("images/scope.png", Texture.class);
             }
         
             public void finishLoading() {
@@ -81,7 +76,6 @@ some public field for commonly used assets, such as skin and font that we will u
                 skin = assets.get("ui/uiskin.json");
                 uiFont = assets.get("font/Amble-Regular-26.fnt");
                 sceneAsset = assets.get(Settings.GLTF_FILE);
-                scopeImage = assets.get("images/scope.png");
             }
         
             public <T> T get(String name ) {
@@ -107,20 +101,17 @@ As we have only a few assets, we will load them all synchronously by calling `fi
 
             public static Assets assets;
         
-                @Override
-                public void create() {
-                    Gdx.app.log("Main", "create()");
-                    assets = new Assets();
-                    assets.finishLoading();
-                    setScreen(new GameScreen(this));
-                }
-            
-                @Override
-                public void dispose() {
-                    Gdx.app.log("Main", "dispose()");
-                    assets.dispose();
-                    super.dispose();
-                }
+            @Override
+            public void create() {
+                assets = new Assets();
+                assets.finishLoading();
+                setScreen(new GameScreen());
+            }
+        
+            @Override
+            public void dispose() {
+                assets.dispose();
+                super.dispose();
             }
         }
 ```
@@ -193,11 +184,10 @@ We can also play a little sound effect, also in the World class, when the game i
                     Main.assets.sounds.GAME_COMPLETED.play();
                 stats.levelComplete = true;
             }
+            if(player.isDead())
+                return;
             playerController.update(player, deltaTime);
-            physicsWorld.update();
-            syncToPhysics();
-            for(GameObject go : gameObjects)
-                go.update(this, deltaTime);
+            //...
         }
 ```
 

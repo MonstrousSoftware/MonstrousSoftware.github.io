@@ -285,6 +285,15 @@ The World class with have a GameStats field called `stats`.
         }
 ```
 
+Add the following lines to `World#spawnObject` to update the number of enemies and collectibles:
+
+```java
+        if(go.type == GameObjectType.TYPE_ENEMY)
+            stats.numEnemies++;
+        if(go.type == GameObjectType.TYPE_PICKUP_COIN)
+            stats.numCoins++;
+```
+
 Now that we have bullets flying around we also need to handle when those bullets hit something relevant. Let us modify handleCollision()
 which we introduced in the previous step:
 
