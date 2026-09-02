@@ -97,11 +97,48 @@ All other game objects get a 'null' Behaviour instance.
         }
 ```
 
-Now to subclass Behaviour for the enemy cook character.  The cook will also use a capsule collision shape just like the player and we will also disable any rotation of the capsule.  For this, we call
-the method `setCapsuleCharacteristics()` which was formerly known as `setPlayerCharacteristics()`. The update() method will be called each frame and allows the enemy character to 
-act out some behaviour pattern.  In this case, it will be very basic behaviour.  It stops doing anything, when the character is dead (health <= 0). (We will add this field shortly).
+Let us extend the `GameObject` class to give each object a health value, which will range from 0 to 1, and a `Behaviour` instance. We also add an update() method to GameObject
+which will in turn calls Behaviour.update() unless the behaviour is null.
+
+```java        
+        public class GameObject {
+        
+            public final GameObjectType type;
+            public final Scene scene;
+            public final PhysicsBody body;
+            public final Vector3 direction;
+            public boolean visible;
+            public float health;
+            public Behaviour behaviour;
+        
+            public GameObject(GameObjectType type, Scene scene, PhysicsBody body) {
+                this.type = type;
+                this.scene = scene;
+                this.body = body;
+                body.geom.setData(this);            // the geom has user data to link back to GameObject for collision handling
+                direction = new Vector3();
+                visible = true;
+                health = 1f;
+                behaviour = Behaviour.createBehaviour(this);
+            }
+                              
+            public void update(World world, float deltaTime ){
+                if(behaviour != null)
+                    behaviour.update(world, deltaTime);
+            }
+            
+            public boolean isDead() {
+                return health <= 0;
+            }
+            //...
+        }
+```
+
+Now to subclass `Behaviour` for the enemy cook character.  The cook will also use a capsule collision shape just like the player, and we will also disable any rotation of the capsule.  For this, we call
+the method `setCapsuleCharacteristics()` after renaming it from `setPlayerCharacteristics()`. The update() method will be called each frame and allows the enemy character to 
+act out some behaviour pattern.  In this case, it will be very basic behaviour.  It stops doing anything, when the character is dead.
 Otherwise, it will always turn to face the player character and move towards the player up to some distance.  Then every so often it will spawn an enemy bullet (a pan) which is thrown in the direction of 
-the player.  The shootPan() method is very similar to the shootBall() method we saw earlier.
+the player.  The shootPan() method is very similar to the shoot() method we saw earlier.
 
 ```java
         public class CookBehaviour extends Behaviour {
@@ -127,17 +164,17 @@ the player.  The shootPan() method is very similar to the shootBall() method we 
         
             @Override
             public void update(World world, float deltaTime ) {
-                if(go.health <= 0)   // don't do anything when dead
+                if(go.isDead())   // don't do anything when dead
                     return;
         
                 // move towards player
-                targetDirection.set(world.getPlayer().getPosition()).sub(go.getPosition());  // vector towards player
+                targetDirection.set(world.player.getPosition()).sub(go.getPosition());  // vector towards player
                 targetDirection.y = 0;  // consider only vector in horizontal plane
                 float distance = targetDirection.len();
                 targetDirection.nor();      // make unit vector
                 direction.set(targetDirection);
                 if(distance > 5f)   // move unless quite close
-                    go.body.applyForce(targetDirection.scl(3f));
+                    go.body.applyForce(targetDirection.scl(10f));
         
         
                 // rotate to follow player
@@ -152,7 +189,7 @@ the player.  The shootPan() method is very similar to the shootBall() method we 
         
                 // every so often shoot a pan
                 shootTimer -= deltaTime;
-                if(shootTimer <= 0 && distance < 20f && world.getPlayer().health > 0) {
+                if(shootTimer <= 0 && distance < 20f && world.player.health > 0) {
                     shootTimer = SHOOT_INTERVAL;
                     shootPan(world);
                 }
@@ -163,7 +200,7 @@ the player.  The shootPan() method is very similar to the shootBall() method we 
                 spawnPos.nor().scl(1f);
                 spawnPos.add(go.getPosition()); // spawn from 1 unit in front of the character
                 spawnPos.y += 1f;
-                GameObject pan = world.spawnObject(GameObjectType.TYPE_ENEMY_BULLET, "pan", "panProxy", CollisionShapeType.MESH, true, spawnPos, Settings.panMass );
+                GameObject pan = world.spawnObject(GameObjectType.TYPE_ENEMY_BULLET, "pan", "panProxy", CollisionShapeType.BOX, true, spawnPos, Settings.panMass );
                 shootDirection.set(direction);        // shoot forward
                 shootDirection.y += 0.5f;       // and slightly up
                 shootDirection.scl(Settings.panForce);   // scale for speed
@@ -174,85 +211,54 @@ the player.  The shootPan() method is very similar to the shootBall() method we 
         }
 ```
 
+We add the following lines to the `Settings` class to set attributes for the pan object and the cook's throwing force:
 
-
-Let use extend the GameObject class to give each object a health value, which will range from 0 to 1, and a Behaviour instance. We also add an update() method to GameObject
-which will in turn calls Behaviour.update() unless the behaviour is null. 
-
-```java        
-        public class GameObject {
-        
-            public final GameObjectType type;
-            public final Scene scene;
-            public final PhysicsBody body;
-            public final Vector3 direction;
-            public boolean visible;
-            public float health;
-            public Behaviour behaviour;
-        
-            public GameObject(GameObjectType type, Scene scene, PhysicsBody body) {
-                this.type = type;
-                this.scene = scene;
-                this.body = body;
-                body.geom.setData(this);            // the geom has user data to link back to GameObject for collision handling
-                visible = true;
-                direction = new Vector3();
-                health = 1f;
-                behaviour = Behaviour.createBehaviour(this);
-            }
-                              
-            public void update(World world, float deltaTime ){
-                if(behaviour != null)
-                    behaviour.update(world, deltaTime);
-            }
-            
-            public boolean isDead() {
-                return health <= 0;
-            }
-            //...
-        }
+```java
+    static public float panMass = 0.2f;
+    static public float panForce = 100f;
 ```
 
-For the cook character we will also use a capsule for collision geometry, and we will use the same trick as for the player to keep the capsule upright, namely to disable angular rotation 
-on the physics body.  To rotate the modelInstance in the game view, we will use the direction vector from the CookBehaviour class to find the forward facing direction.
-We can also now use the game object type to determine how we should update
-the modelInstance transform.  For the player we get the orientation from the player controller, for the enemy
+And to PhysicsObject we add the following method to add torque to a body. We use this to rotate the cook and to give some spin to the pans he throws:
+
+```java
+    public void applyTorque( Vector3 torque ){
+        DBody rigidBody = geom.getBody();
+        rigidBody.addTorque(torque.x, torque.y, torque.z);  
+    }
+```
+
+In the update() method of the `World` class, call the new `update()` method for each game object.
+In the same method we also synchronize the model instance transforms to the rigid bodies. We already had a special case for the player character, we also
+need to add logic for the enemy characters. Recall that for the cook character we're also using a capsule for collision geometry.  
+To rotate the modelInstance in the game view, we will use the direction vector from the CookBehaviour class to find the forward facing direction.
+We can also now use the game object type to determine how we should update the modelInstance transform:  For the player we get the orientation from the player controller, for the enemy
 we get it from the CookBehaviour object and for other game objects we get it from the rigid body orientation.
 
 
 ```java  
-        private void syncToPhysics() {
-            for(GameObject go : gameObjects){
-                if( go.body.geom.getBody() != null) {
-                    if(go.type == GameObjectType.TYPE_PLAYER){
-                        // use information from the player controller, since the rigid body is not rotated.
-                        player.scene.modelInstance.transform.setToRotation(Vector3.Z, playerController.getForwardDirection());
-                        player.scene.modelInstance.transform.setTranslation(go.body.getPosition());
-                    }
-                    else if(go.type == GameObjectType.TYPE_ENEMY){
-                        CookBehaviour cb = (CookBehaviour) go.behaviour;
-                        go.scene.modelInstance.transform.setToRotation(Vector3.Z, cb.getDirection());
-                        go.scene.modelInstance.transform.setTranslation(go.body.getPosition());
-                    }
-                    else
-                        go.scene.modelInstance.transform.set(go.body.getPosition(), go.body.getOrientation());
+    public void update( float deltaTime ) {
+        playerController.update(player, deltaTime);
+        for(GameObject go : gameObjects)
+            go.update(this, deltaTime);
+        physicsWorld.update(deltaTime);
+        for(GameObject go : gameObjects){
+            if( go.body.geom.getBody() != null) {
+                if(go.type == GameObjectType.TYPE_PLAYER){
+                    // use information from the player controller, since the rigid body is not rotated.
+                    player.scene.modelInstance.transform.setToRotation(Vector3.Z, playerController.getForwardDirection());
+                    player.scene.modelInstance.transform.setTranslation(go.body.getPosition());
                 }
+                else if(go.type == GameObjectType.TYPE_ENEMY){
+                    CookBehaviour cb = (CookBehaviour) go.behaviour;
+                    go.scene.modelInstance.transform.setToRotation(Vector3.Z, cb.getDirection());
+                    go.scene.modelInstance.transform.setTranslation(go.body.getPosition());
+                }
+                else
+                    go.scene.modelInstance.transform.set(go.body.getPosition(), go.body.getOrientation());
             }
         }
+    }
 ```
-
-In the update() method of the World class, call the new `update()` method for each game object:
-
-```java 
-        public void update( float deltaTime ) {
-            playerController.update(player, deltaTime);
-            physicsWorld.update();
-            syncToPhysics();
-            for(GameObject go : gameObjects)            
-                go.update(this, deltaTime);
-        }
-```
-
 
 To keep score during the game, let's add a class with game statistics, e.g. the number of coins collected and the number of enemies remaining.
 The World class with have a GameStats field called `stats`.
@@ -294,6 +300,17 @@ which we introduced in the previous step:
                 bulletHit(go1, go2);                            //<-- new
        }
 ```
+The new method bulletHit() is called when a character (the player or an enemy) is hit by a bullet from the opposing side.
+It takes 25% health and removes the character when dead.
+
+```java
+        private void bulletHit(GameObject character, GameObject bullet) {
+            removeObject(bullet);
+            character.health -= 0.25f;      // - 25% health
+            if(character.isDead()) 
+                removeObject(character);
+        }
+```
 
 The pickup() method is adapted to count the number of coins picked up or to add some health depending on the type of object picked up:
 
@@ -307,20 +324,10 @@ The pickup() method is adapted to count the number of coins picked up or to add 
         }
 ```
 
-The new method bulletHit() is called when a character (the player or an enemy) is hit by a bullet from the opposing side.
-It takes 25% health and removes the character when dead.
 
-```java
-        private void bulletHit(GameObject character, GameObject bullet) {
-            removeObject(bullet);
-            character.health -= 0.25f;      // - 25% health
-            if(character.isDead()) 
-                removeObject(character);
-        }
-```
-
-The shoot() method needs a bit of updating, because the spawnObject() method has more parameters now. We also add a check to stop the 
-player from shooting once they're dead:
+The shoot() method needs a bit of updating, because the spawnObject() method needs to use the type for a "friendly bullet", i.e. a projectile fire by the player. 
+We need this type information to handle collisions between balls and enemies.
+We also add a check to stop the player from shooting once they're dead:
 
 ```java
         public void shoot() {
@@ -333,24 +340,38 @@ player from shooting once they're dead:
             shootDirection.set(dir);        // shoot forward
             shootDirection.y += 0.5f;       // and slightly up
             shootDirection.scl(Settings.ballForce);   // scale for speed
-            ball.body.geom.getBody().setDamping(0.0f, 0.0f);
             ball.body.applyForce(shootDirection);
         }
 ```
 
 Since we're now also removing game objects when they have been shot, we need to update the `remove()` method. We update the statistics for number of enemies remaining.
-We also call a new `GameObject.dispose()` method which will take care that the ODE rigid body and collision geometry are properly destroyed.
+We cannot destroy the geom and rigid body at this point because we are still in the middle of a physics step.  We were called from the collision callback method and 
+destroying rigid bodies at this stage will produce an error message from ODE.
 
 ```java
         public void removeObject(GameObject gameObject){
             gameObject.health = 0;
             if(gameObject.type == GameObjectType.TYPE_ENEMY)
                 stats.numEnemies--;
-            gameObjects.removeValue(gameObject, true);
-            gameObject.dispose();
             isDirty = true;     // list of game objects has changed
         }
 ```
+
+So we do the cleanup at the end of the `World#update` method by removing and disposing all game objects that are marked as dead:
+
+```java
+        // remove dead objects
+        for(int i = 0; i < gameObjects.size; i++){
+            GameObject go = gameObjects.get(i);
+            if(go.isDead()){
+                gameObjects.removeValue(go, true);
+                go.dispose();
+            }
+        }
+```
+
+This calls a new `GameObject.dispose()` method which will take care that the ODE rigid body and collision geometry are properly destroyed.
+
 
 Where `GameObject.destroy()` is defined as follows:
 
@@ -369,6 +390,13 @@ And `PhysicsBody.destroy()` as follows:
                 geom.getBody().destroy();
             geom.destroy();
         }
+```
+
+Add the following line to the start of `World#update` to halt the game as soon as the player is dead:
+
+```java
+        if(player.isDead())
+            return;
 ```
 
 This concludes step 10.  We've introduced an enemy character, the concept of health points and taking damage from each other's projectiles and using health packs to restore health. 
