@@ -286,8 +286,7 @@ So we introduce this debug option early.
         }   
 ```
 
-To present the debug view of all collision shapes corresponding to World game objects, we add a simple class with a ModelBatch that shows all debug instances.  It will use a color code to show which shapes are static, which are active and which are sleeping. :
-Active shapes will fall asleep if they have not moved for a while, which means fewer calculations need to be done, allowing better performance.
+To present the debug view of all collision shapes corresponding to World game objects, we add a simple class with a ModelBatch that shows all debug instances. 
 
 ```java
     public class PhysicsView implements Disposable {
