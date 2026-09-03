@@ -72,8 +72,29 @@ And lastly the GUI needs to be disposed when the GameScreen is closed to release
                 ...
                 gui.dispose();
             }
-        }
 ```
+
+And add a method to restart the game. Also make sure that cursor is captured again, in case we released it for GUI interaction.
+
+```java
+            public void restart() {
+                Populator.populate(world);
+                Gdx.input.setCursorCatched(true);
+            }
+```
+
+And for consistency, make sure that the handling of the 'R' key in `render` also calls restart:
+```java
+    @Override
+    public void render(float delta) {
+        //...
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R))
+            restart();
+        //...
+    }
+```
+
 
 Now to write the GUI class itself. First we'll make a rough outline, then we'll fill in the details.
 
@@ -151,7 +172,7 @@ The "GAME OVER" label and the Restart button are set to hidden. They will be mad
                 gameOverLabel = new Label("GAME OVER", labelStyle);
                 restartButton = new TextButton("RESTART", skin);
        
-                 screenTable.top();
+                screenTable.top();
                 // 4 columns: 2 at the left, 2 at the right
                 // row 1
                 screenTable.add(new Label("Health: ", labelStyle)).padLeft(5);
@@ -207,7 +228,7 @@ As the labels need to reflect the actual situation, we create a method called `u
 This obtains values from the World instance and uses gives the labels a corresponding value.  
 In a real game, you'd want to make this a lot more appealing, maybe using icons, a health bar etc. instead of plain text labels.
 We use a StringBuffer to avoid garbage collection from doing string concatenations every frame.
-This method also check if the player has died, in which case it unhides the GAME OVER label and the restart button.
+This method also check if the player has died, in which case it unhides the "GAME OVER" label and the restart button.
 It also unhides the mouse so that the user can actually click the button.  The mouse cursor is hidden again when the button is clicked.
 
 
@@ -263,6 +284,7 @@ Let us add a basic cross-hair to the screen overlay. First define a label as a n
 
 ```java
         private Label crossHairLabel;
+```
 
 Then we add the following lines to the rebuild() method to create a new full-screen table which we add as actor to the stage.
 This table has only a single label widget with a plus sign.  The label will be automatically centred on the screen.
@@ -274,6 +296,7 @@ This table has only a single label widget with a plus sign.  The label will be a
             crossHairLabel = new Label("+", skin);
             crossHairTable.add(crossHairLabel);
             stage.addActor(crossHairTable);
+```
 
 We want to show the cross-hair only when in first person view. Therefore, we add a method to show or hide it.
 
@@ -289,7 +312,7 @@ In GameScreen we can call this method to enable the cross-hair only when in firs
         @Override
         public void render(float delta) {
             ...
-            gui.showCrossHair( !gameView.inThirdPersonMode() );
+            gui.showCrossHair( !gameView.camController.getThirdPersonMode() );
             gui.render(delta);
         }
 ```

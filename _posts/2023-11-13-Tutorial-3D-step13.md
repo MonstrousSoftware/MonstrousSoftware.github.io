@@ -30,7 +30,8 @@ We should now be able to see the gun close to the player at startup and pick it 
 ## Gun View
 
 The next step is to show the gun from first person view.  Because Ducky, our player character, has no hands we will not render any arms or hands, but just a gun floating in front of the camera.
-We will render the first person weapon as a 3d overlay over the view of the game world. In fact, we will actually use a separate GameView instance and a separate World instance which will only contain the gun.
+We will render the first person weapon as a 3d overlay over the view of the game world. In other words, we're first going to render a 3d view from first person perspective and
+then we are going to render another 3d view on top of that of the gun. In fact, we will actually use a separate GameView instance and a separate World instance which will only contain the gun.
 
 First a few changes are needed to the GameView class. We add more parameters to the constructor to define if the view is an overlay view, to define the near and far distances for the camera clipping planes and a scale factor 
 for the head bobbing effect.  The skybox is created only if the view is not an overlay.
@@ -68,7 +69,7 @@ background anyway.
 ```java
         public void render(float delta ) {
             if(!isOverlay)
-                camController.update(world.getPlayer().getPosition(), world.getPlayerController().getViewingDirection());
+                camController.update(world.player.getPosition(), world.getPlayerController().getViewingDirection());
             cam.update();
             if(world.isDirty())
                 refresh();
@@ -90,8 +91,8 @@ Add the following fields:
 We now create the gameView object as follows:
 ```java
         gameView = new GameView(world,false, 0.1f, 300f, 1f);
-        gameView.getCameraController().setThirdPersonMode(thirdPersonView);
-        world.getPlayer().visible = thirdPersonView;            // hide player mesh in first person
+        gameView.camController.setThirdPersonMode(thirdPersonView);
+        world.player.visible = thirdPersonView;            // hide player mesh in first person
 ```
 And we add the following lines at the end of `show()` to create the gun world and the gun view:
 ```java
@@ -108,15 +109,15 @@ And we add the following lines at the end of `show()` to create the gun world an
 ```    
 In the Settings class the following new lines are added:
 ```java
-        static public Vector3 gunPosition = new Vector3(-1.1f, 1.9f, 1.8f); // gun position in gun camera view
+        static public Vector3 gunPosition = new Vector3(-1.1f, 1.1f, 1.8f); // gun position in gun camera view
         static public float gunScale = 3.0f;
 ```
 The following code is added to `GameScreen.render()` to replace the code we removed from GameView to toggle between first person and third person:
 ```java
         if (Gdx.input.isKeyJustPressed(Input.Keys.F2) ) {
-            thirdPersonView = !gameView.getCameraController().getThirdPersonMode();
-            gameView.getCameraController().setThirdPersonMode(thirdPersonView);
-            world.getPlayer().visible = thirdPersonView;            // hide player mesh in first person
+            thirdPersonView = !gameView.camController.getThirdPersonMode();
+            gameView.camController.setThirdPersonMode(thirdPersonView);
+            world.player.visible = thirdPersonView;            // hide player mesh in first person
             gameView.refresh();
         }
 ```
@@ -188,7 +189,7 @@ weapon the player is currently holding. We also use this class to keep a timer t
 
 Then we add a WeaponState object as a public field of the World class:
 ```java
-        public final WeaponState weaponState;
+        public final WeaponState weaponState = new WeaponState();
 ```
 And we make sure to call the weapon state update method in `World.update()`:
 ```java
@@ -219,12 +220,24 @@ Now we can modify the `pickup()` method in the World class to play a sound effec
         }
     }
 ```
-Next step is to play the gun's fire animation when shooting. First we will replace the `World.shootBall()` method by something more generic and use the WeaponState object to
+
+Now we in `GameScreen#render` we should only render the gun view if the current weapon is the gun:
+
+```java
+        if(!thirdPersonView && world.weaponState.currentWeaponType == WeaponType.GUN) {
+            gunView.render(delta);
+        }
+```
+At this point the gun appears only in view after you've picked it up from the ground.
+
+
+
+Next step is to play the gun's fire animation when shooting. First we will replace the `World.shoot()` method by something more generic and use the WeaponState object to
 indicate if the gun is firing.  We will then trigger the animation from `GameScreen.update()`   
 
-Replace `shootBall()` with the following code:
+Replace `shoot()` with the following code:
 ```java
-        public void fireWeapon(Vector3 viewingDirection) {
+        public void shoot() {
             if(player.isDead())
                 return;
             if(!weaponState.isWeaponReady())  // to give delay between shots
@@ -233,12 +246,13 @@ Replace `shootBall()` with the following code:
     
             switch(weaponState.currentWeaponType) {
                 case BALL:
-                    spawnPos.set(viewingDirection);
+                    dir.set(playerController.getViewingDirection());
+                    spawnPos.set(dir);
                     spawnPos.add(player.getPosition()); // spawn from 1 unit in front of the player
-                    GameObject ball = spawnObject(GameObjectType.TYPE_FRIENDLY_BULLET, "ball", null, CollisionShapeType.SPHERE, true, spawnPos, Settings.ballMass );
-                    shootDirection.set(viewingDirection);        // shoot in viewing direction (can be up or down from player direction)
+                    GameObject ball = spawnObject(GameObjectType.TYPE_FRIENDLY_BULLET, "ball", null, CollisionShapeType.SPHERE, true, spawnPos, Settings.ballMass);
+                    shootDirection.set(dir);        // shoot forward
+                    shootDirection.y += 0.5f;       // and slightly up
                     shootDirection.scl(Settings.ballForce);   // scale for speed
-                    ball.body.geom.getBody().setDamping(0.0f, 0.0f);
                     ball.body.applyForce(shootDirection);
                     break;
                 case GUN:
@@ -248,12 +262,12 @@ Replace `shootBall()` with the following code:
         }
 ```
 
-Add the following method to PlayerController to shoot with the left mouse button:
+Add the following method to PlayerController to shoot with the left mouse button (at this point PlayerController needs to have a member `world` which can be set via its constructor):
 ```java
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
             if(button == Input.Buttons.LEFT) {
-                world.fireWeapon(  viewingDirection );
+                world.shoot();
             }
             return false;
         }
@@ -298,10 +312,10 @@ We create a new class `HitPoint` to hold the details of a contact between the sh
     
         public PhysicsRayCaster(PhysicsWorld physicsWorld) {
             this.physicsWorld = physicsWorld;
-            groundRay = OdeHelper.createRay(1);        // length gets overwritten when ray is used
-            shootRay = OdeHelper.createRay(1);        // length gets overwritten when ray is used
+            groundRay = OdeHelper.createRay(3);        // length gets overwritten when ray is used
+            shootRay = OdeHelper.createRay(3);        // length gets overwritten when ray is used
         }
-        ...
+        //...
 
         // class to contain details of hit point
         public static class HitPoint {
@@ -321,7 +335,7 @@ We create a new class `HitPoint` to hold the details of a contact between the sh
         //
         public boolean findTarget(Vector3 playerPos, Vector3 viewDir, HitPoint hitPoint) {
             shootRay.setLength(100);    // shooting distance
-            shootRay.set(playerPos.x, -playerPos.z, playerPos.y, viewDir.x, -viewDir.z, viewDir.y); // point ray in viewing direction, starting at player's centre
+            shootRay.set(playerPos.x, playerPos.y, playerPos.z, viewDir.x, viewDir.y, viewDir.z); // point ray in viewing direction, starting at player's centre
     
             // the following settings are only relevant to triMesh collisions which can be expensive
             // they do NOT mean only the first or closest geom is returned,
@@ -360,9 +374,9 @@ We create a new class `HitPoint` to hold the details of a contact between the sh
                         hitPoint.distance = (float)d;
                         hitPoint.refObject = go;
                         DVector3 normal = contacts.get(0).getContactGeom().normal;
-                        hitPoint.normal.set((float) normal.get(0),-(float) normal.get(2), (float) normal.get(1));
+                        hitPoint.normal.set((float) normal.get(0),(float) normal.get(1), (float) normal.get(2));
                         DVector3 pos = contacts.get(0).getContactGeom().pos;
-                        hitPoint.worldContactPoint.set((float) pos.get(0), -(float) pos.get(2), (float) pos.get(1));
+                        hitPoint.worldContactPoint.set((float) pos.get(0), (float) pos.get(1), (float) pos.get(2));
                     }
                 }
             }
@@ -371,34 +385,26 @@ We create a new class `HitPoint` to hold the details of a contact between the sh
 
 
 Now update PlayerController and adapt the `touchDown()` method we just added to make use of the ray caster to find a hit point.
-This hit point is passed as an additional parameter to `world.fireWeapon()` to provide the point of impact of a gun shot.
+This hit point is passed as an additional parameter to `world.shoot()` to provide the point of impact of a gun shot.
 ```java
         private final PhysicsRayCaster.HitPoint hitPoint = new PhysicsRayCaster.HitPoint();
-
-        public PlayerController(World world)  {
-            this.world = world;
-            linearForce = new Vector3();
-            forwardDirection = new Vector3();
-            viewingDirection = new Vector3();
-            reset();
-        }
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
             if(button == Input.Buttons.LEFT) {
-                world.rayCaster.findTarget(world.getPlayer().getPosition(), viewingDirection, hitPoint);
-                world.fireWeapon(  viewingDirection, hitPoint  );
+                world.rayCaster.findTarget(world.player.getPosition(), viewingDirection, hitPoint);
+                world.shoot(  viewingDirection, hitPoint  );
             }
             return false;
         }
 ```
 
-The `fireWeapon()` method in the World class now needs updating to use this extra hit point parameter. We can calculate an impulse and apply it to the object that was shot.  This will make small 
+The `shoot()` method in the World class now needs updating to use this extra hit point parameter. We can calculate an impulse and apply it to the object that was shot.  This will make small 
 objects shoot away and larger objects will be pushed back:
 ```java
         private final Vector3 impulse = new Vector3();
     
-        public void fireWeapon(Vector3 viewingDirection,  PhysicsRayCaster.HitPoint hitPoint) {
+        public void shoot(Vector3 viewingDirection,  PhysicsRayCaster.HitPoint hitPoint) {
                 if(player.isDead())
                     return;
                 if(!weaponState.isWeaponReady())  // to give delay between shots
@@ -430,16 +436,47 @@ We need an additional method in PhysicsBody to apply a force with an offset inst
 The method is very similar to `applyForce()`.
 
 ```java
-        public void applyForce( Vector3 force ){
-            DBody rigidBody = geom.getBody();
-            rigidBody.addForce(force.x, -force.z, force.y);  // swap z & y
-        }
-    
-        public void applyForceAtPos( Vector3 force, Vector3 pos ){
-            DBody rigidBody = geom.getBody();
-            rigidBody.addForceAtPos(force.x, -force.z, force.y, pos.x, -pos.z, pos.y);  // swap z & y
-        }
+    public void applyForceAtPos( Vector3 force, Vector3 pos ){
+        DBody rigidBody = geom.getBody();
+        rigidBody.addForceAtPos(force.x, force.y, force.z, pos.x, pos.y, pos.z);
+    }
 ```
 
+Add a new parameter to `Settings`:
+
+```java
+    static public float gunForce = 200f;
+```
+
+The `World` method `bulletHit()` is changed to take only one parameter: the object being hit.  We move the removal of projectiles to `handleCollision`.
+This way we can use `bulletHit()` also for gun shots where we don't actually have a projectile.
+
+```java
+    private void handleCollision(GameObject go1, GameObject go2){
+        if(go1.type.isStatic || go2.type.isStatic)
+            return;
+        if(go1.type.isPlayer && go2.type.canPickup){
+            pickup(go1, go2);
+        }
+        if(go1.type.isPlayer && go2.type.isEnemyBullet) {
+            removeObject(go2);  // destroy bullet
+            bulletHit(go1);
+        }
+        if(go1.type.isEnemy && go2.type.isFriendlyBullet) {
+            removeObject(go2);  // destroy bullet
+            bulletHit(go1);
+        }
+    }
+
+    private void bulletHit(GameObject character) {
+        character.health -= 0.25f;      // - 25% health
+        Main.assets.sounds.HIT.play();
+        if(character.isDead()) {
+            removeObject(character);
+            if (character.type.isPlayer)
+                Main.assets.sounds.GAME_OVER.play();
+        }
+    }
+```
 
 This concludes step 13. We can now pick up the gun and shoot at the cooks or at other objects, such as the coins or the balls.
