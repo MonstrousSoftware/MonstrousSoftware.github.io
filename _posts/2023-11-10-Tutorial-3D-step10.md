@@ -214,8 +214,8 @@ the player.  The shootPan() method is very similar to the shoot() method we saw 
 We add the following lines to the `Settings` class to set attributes for the pan object and the cook's throwing force:
 
 ```java
-    static public float panMass = 0.2f;
-    static public float panForce = 100f;
+    static public float panMass = 0.05f;
+    static public float panForce = 40f;
 ```
 
 And to PhysicsObject we add the following method to add torque to a body. We use this to rotate the cook and to give some spin to the pans he throws:
