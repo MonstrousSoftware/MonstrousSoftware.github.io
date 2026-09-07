@@ -37,30 +37,7 @@ Lwjgl3Launcher.java:
 Although in many places, we already used deltaTime to make game behaviour independent of frame rate, there were in fact still a few places
 where it was not done properly.
 
-In the PhysicsWorld class we update the physics.  The physics library ODE does not work well with a variable time step.  You can however use the delta time,
-to ensure you run an update cycle at the desired rate. (Also update `World.update()` to pass the new parameter `deltaTime`).
-
-PhysicsWorld.java:
-
-```java
-    static final float TIME_STEP = 0.025f;  // fixed physics time step
-
-    // update the physics
-    // time step of quickStep() needs to be fixed size
-    //
-    public void update(float deltaTime) {
-            timeElapsed += deltaTime;
-            while(timeElapsed > TIME_STEP) {
-                space.collide(null, nearCallback);
-                world.quickStep(TIME_STEP);
-                contactGroup.empty();
-    
-                timeElapsed -= TIME_STEP;
-            }
-        }
-```
-
-Then we notice the enemies are moving much too fast. Where we are applying force to the enemy rigid bodies, we need to scale this with the time step.
+We notice the enemies are moving much too fast. Where we are applying force to the enemy rigid bodies, we need to scale this with the time step.
 Change as follows (you could also change `Settings.cookForce` to get rid of this 60f constant) :
 
 CookBehaviour.java:

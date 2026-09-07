@@ -31,7 +31,31 @@ to construct the nav mesh.
 Of course, creating a nav mesh by hand is not ideal. And it needs to be redone whenever you change the map. 
 There are techniques to generate a navmesh automatically, but we’ll leave these for another day.
 
+To make sure that we see all the static objects in the game which were used to determine the navmesh, update the `Populator` class as follows. 
+This adds a little bridge for example and some sloping walls.
 
+```java
+        public static void populate(World world) {
+        world.clear();
+        world.spawnObject(GameObjectType.TYPE_STATIC, "brickcube", null, CollisionShapeType.BOX, false, Vector3.Zero, 1);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "groundbox", null, CollisionShapeType.BOX, false, Vector3.Zero, 1f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "brickcube.001", null, CollisionShapeType.BOX, false, Vector3.Zero, 1f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "brickcube.002", null, CollisionShapeType.BOX, false, Vector3.Zero, 1f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "brickcube.003", null, CollisionShapeType.BOX, false, Vector3.Zero, 1f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "brickcube.004", null, CollisionShapeType.BOX, false, Vector3.Zero, 1f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "wall", null, CollisionShapeType.BOX, false, Vector3.Zero, 1f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "wall.001", null, CollisionShapeType.BOX, false, Vector3.Zero, 0f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "wall.002", null, CollisionShapeType.BOX, false, Vector3.Zero, 0f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "arch", null, CollisionShapeType.MESH, false, Vector3.Zero, 1f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "stairs", "stairsProxy", CollisionShapeType.MESH, false, Vector3.Zero, 0f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "stairs.001", "stairsProxy.001", CollisionShapeType.MESH, false, Vector3.Zero, 0f);
+        world.spawnObject(GameObjectType.TYPE_STATIC, "walkway", "walkway", CollisionShapeType.MESH, false, Vector3.Zero, 0f);
+    
+        world.spawnObject(GameObjectType.TYPE_STATIC, "ramp", null, CollisionShapeType.MESH, false, Vector3.Zero, 0f);
+        // etc.
+    }
+
+```
 
 Let us first define a class for a node in the navigation mesh, a simple triangle with an id value for aid in debugging.
 
@@ -54,7 +78,7 @@ Now we can create a class to represent a navigation mesh. It stores the mesh as 
 
 ```java
 public class NavMesh {
-    public Array<NavNode> navNodes;         // nodes in nav mesh (triangles)
+    public final Array<NavNode> navNodes;         // nodes in nav mesh (triangles)
 
 
     // create a navigation mesh from the mesh of a model instance
@@ -87,18 +111,18 @@ public class NavMeshBuilder {
 
         int numVertices = mesh.getNumVertices();
         int numIndices = mesh.getNumIndices();
-        int stride = mesh.getVertexSize() / 4;        // floats per vertex in mesh, e.g. for position, normal, textureCoordinate, etc.
+        int stride = mesh.getVertexSize() / Float.BYTES;        // floats per vertex in mesh, e.g. for position, normal, textureCoordinate, etc.
 
         float[] vertices = new float[numVertices * stride];
         short[] indices = new short[numIndices];
         // find offset of position floats per vertex, they are not necessarily the first 3 floats
-        int posOffset = mesh.getVertexAttributes().findByUsage(VertexAttributes.Usage.Position).offset / 4;
+        int posOffset = mesh.getVertexAttributes().findByUsage(VertexAttributes.Usage.Position).offset /Float.BYTES;
 
         mesh.getVertices(vertices);
         mesh.getIndices(indices);
 
         NavMesh navMesh = new NavMesh();
-        Vector3 corners[] = new Vector3[3];
+        Vector3 [] corners = new Vector3[3];
         for (int i = 0; i < 3; i++)
             corners[i] = new Vector3();
 
@@ -138,7 +162,7 @@ can define the Array capacity as 3 to save memory. (The default Array capacity i
 public class NavNode {
     public final int id;
     public final Vector3 p0, p1, p2;
-    public Array<NavNode> neighbours;
+    public final Array<NavNode> neighbours;
 
     public NavNode( int id, Vector3 a, Vector3 b, Vector3 c) {
         this.id = id;
@@ -228,9 +252,9 @@ only with the one just below the feet.
 public class NavNode {
     public final int id;
     public final Vector3 p0, p1, p2;
-    public Array<NavNode> neighbours;
-    public Vector3 normal;
-    private float d;        // for plane equation
+    public final Array<NavNode> neighbours;
+    public final Vector3 normal;
+    private final float d;        // for plane equation
 
     public NavNode( int id, Vector3 a, Vector3 b, Vector3 c) {
         normal = new Vector3();
@@ -260,6 +284,50 @@ public class NavNode {
     }
 }
 ```
+
+At this point we should add a navmesh object to the `World` class:
+
+```java
+    public NavMesh navMesh;
+```
+
+And this is built from the `spawnObject` method:
+```java
+    public GameObject spawnObject(GameObjectType type, String name, String proxyName, CollisionShapeType shapeType, boolean resetPosition, Vector3 position, float mass) {
+        Scene scene = loadNode(name, resetPosition, position);
+        ModelInstance collisionInstance = scene.modelInstance;
+        if (proxyName != null) {
+            Scene proxyScene = loadNode(proxyName, resetPosition, position);
+            collisionInstance = proxyScene.modelInstance;
+        }
+        if (type == GameObjectType.TYPE_NAVMESH) {
+            navMesh = NavMeshBuilder.build(scene.modelInstance);
+            return null;
+        }
+        //...
+    }
+```
+This means we need a new type value in `GameObjectType`:
+```java
+    public final static GameObjectType TYPE_NAVMESH = new GameObjectType("NAVMESH", true, false, false, false,false, false, true);
+```
+And we should spawn it from the `Populate` class:
+```java
+    public static void populate(World world) {
+        world.clear();
+        world.spawnObject(GameObjectType.TYPE_NAVMESH, "NAVMESH", null, CollisionShapeType.MESH, false, Vector3.Zero, 0);
+
+        world.spawnObject(GameObjectType.TYPE_STATIC, "brickcube", null, CollisionShapeType.BOX, false, Vector3.Zero, 1);
+        // etc.
+```
+
+Update the `Settings` class to use the name of the new glTF file which contains the navmesh and add a setting for the height at which we will calculate the character routing:
+```java
+    static public final String GLTF_FILE = "models/step12nav.gltf";
+    static public float navHeight = 1.6f;       // should be about half the height of the characters
+
+```
+
 
 We can now add a method to NavMesh to determine which node a point (for example the player or an enemy) is in.  This is a very basic linear search.  It will be executed a lot so 
 if the navmesh grows larger, it's probably a good idea to use some spatial data structure instead (e.g. octrees, quadtrees).
@@ -346,7 +414,7 @@ we assume that the enemy will be strictly following this given path.
 
 
 To visualize what is happening we can create a view class to render the nodes of the navmesh and give each node a colour depending on its step value.
-This uses MeshBuilder to create a render model every time `update()` is called. This is a relatively expensive operation but it is only used in debug view
+This uses MeshBuilder to create a render model every time `update()` is called. This is a relatively expensive operation, but it is only used in debug view
 and it doesn't seem to affect frame rate too badly in practice.
 
 By calling `update()` and `render()` in the main render loop, after the game world itself has been rendered we can see the navmesh triangles, with the distance to the player
@@ -750,8 +818,13 @@ in the direction of the way point.
                 if (distance > 5f)   // move unless quite close
                     go.body.applyForce(targetDirection.scl(Settings.cookForce * climbFactor));
             }
-    
-            ...
+
+            // every so often shoot a pan
+            shootTimer -= deltaTime;
+            if(shootTimer <= 0 && distance < 20f && world.player.health > 0) {
+                shootTimer = SHOOT_INTERVAL;
+                shootPan(world);
+            }
         }
     }
 ```
