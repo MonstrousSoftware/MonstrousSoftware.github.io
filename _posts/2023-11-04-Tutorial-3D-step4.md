@@ -186,13 +186,12 @@ Mostly this class can be written by moving lines of code out of GameScreen:
         sceneManager.setCamera(cam);
 
         // setup light
-        DirectionalLightEx light = new net.mgsx.gltf.scene3d.lights.DirectionalShadowLight(Settings.shadowMapSize, Settings.shadowMapSize)
-                .setViewport(50,50,10f,100);
+        DirectionalLightEx light = new DirectionalLightEx();
         light.direction.set(1, -3, 1).nor();
         light.color.set(Color.WHITE);
         light.intensity = 3f;
         sceneManager.environment.add(light);
-
+        
         // setup quick IBL (image based lighting)
         IBLBuilder iblBuilder = IBLBuilder.createOutdoor(light);
         environmentCubemap = iblBuilder.buildEnvMap(1024);
@@ -377,10 +376,12 @@ Let us add some shadows to the view. Add the following to the Settings class to 
 ```
 Then in the GameView class replace the following line:
 ```java
+        // remove this line 
         DirectionalLightEx light = new DirectionalLightEx();
 ```
 by this code:
 ```java
+        // add this line
         DirectionalLightEx light = new net.mgsx.gltf.scene3d.lights.DirectionalShadowLight(Settings.shadowMapSize, Settings.shadowMapSize)
             .setViewport(50,50,10,100);
 ```
