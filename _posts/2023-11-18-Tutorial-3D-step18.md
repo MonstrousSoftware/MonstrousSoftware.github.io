@@ -5,21 +5,13 @@ by Monstrous Software
 # Step 18 - Full Screen toggle
 
 Let us add a feature to toggle the game between windowed mode and full screen mode using the F11 function key.
-We add two class fields to remember the window size.  For the HTML version we need to make sure we catch the F11 
-key rather than it being intercepted by the browser.
+We add two class fields to remember the window size.  
 
 
 GameScreen:
 
 ```java
         private int windowedWidth, windowedHeight;
-
-        @Override
-        public void show() {
-            ...
-            Gdx.input.setCatchKey(Input.Keys.F11, true);
-            ...
-        }
 
         private void toggleFullScreen() {        // toggle full screen / windowed screen
             if (!Gdx.graphics.isFullscreen()) {
