@@ -32,7 +32,7 @@ a runnable version of the app.
 - [step 12: GUI](https://monstroussoftware.github.io/2023/11/12/Tutorial-3D-step12.html)
 - [step 13: gun](https://monstroussoftware.github.io/2023/11/13/Tutorial-3D-step13.html)
 - [step 14: scope view](https://monstroussoftware.github.io/2023/11/14/Tutorial-3D-step14.html)
-- [step 15: unified reference frame](https://monstroussoftware.github.io/2023/11/15/Tutorial-3D-step15.html)
+- [step 15: (obsolete)](https://monstroussoftware.github.io/2023/11/15/Tutorial-3D-step15.html)
 - [step 16: game controller support](https://monstroussoftware.github.io/2023/11/16/Tutorial-3D-step16.html)
 - [step 17: head bobbing](https://monstroussoftware.github.io/2023/11/17/Tutorial-3D-step17.html)
 - [step 18: full screen mode](https://monstroussoftware.github.io/2023/11/18/Tutorial-3D-step18.html)
