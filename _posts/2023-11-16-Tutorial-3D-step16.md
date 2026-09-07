@@ -6,20 +6,10 @@ by Monstrous Software
 
 ![controller](/assets/images/controller.png)
 
-Game controllers are, for the moment, not supported by gdx-teavm (and can actually crash the application) so this is an option that will only be available on the desktop version.
-Let us add a field in Settings to enable/disable controller support:
-
-```java
-        static public boolean supportControllers = true;       // disable in case it causes issues
-```
-To automatically set this field we can add the following line to the `create()` method in the Main class:
-```java
-        Settings.supportControllers = (Gdx.app.getType() == Desktop);
-```
 Add the following to `GameScreen.show()`:
 
 ```java
-        if (Settings.supportControllers &&  Controllers.getCurrent() != null) {
+        if (Controllers.getCurrent() != null) {
             MyControllerAdapter controllerAdapter = new MyControllerAdapter(world.getPlayerController(), this);
             Controllers.addListener(controllerAdapter);
         }
@@ -68,18 +58,11 @@ of controllers you may need to add a setup screen where the player can map their
             if (buttonIndex == controller.getMapping().buttonDpadRight)
                 buttonChange(playerController.strafeRightKey, down);
     
-            if (buttonIndex == controller.getMapping().buttonR1 )
-                playerController.setScopeMode(down);
-            if (buttonIndex == controller.getMapping().buttonL1 )
-                playerController.setRunning(down);
-    
             if (buttonIndex == controller.getMapping().buttonStart && down)
                 gameScreen.restart();
     
             if (buttonIndex == controller.getMapping().buttonX)
                 buttonChange(playerController.switchWeaponKey, down);
-            if (buttonIndex == controller.getMapping().buttonY && down)
-                gameScreen.toggleViewMode();
         }
     
         private void buttonChange(int keyCode, boolean down){
@@ -120,6 +103,7 @@ In PlayerController we need to add a few methods to support this:
 ```java
         private final Vector2 stickMove = new Vector2();
         private final Vector2 stickLook = new Vector2();
+        private float stickViewAngle; // angle up or down
     
     
         public void stickMoveX(float value){
@@ -136,6 +120,11 @@ In PlayerController we need to add a few methods to support this:
     
         public void stickLookY(float value){
             stickLook.y = value;
+        }
+        
+        public void fireWeapon() {
+            world.rayCaster.findTarget(world.player.getPosition(), viewingDirection, hitPoint);
+            world.shoot(  viewingDirection, hitPoint );
         }
 ```
 And in `PlayerController.update()` we add the following lines to move the player and rotate the view 
@@ -156,9 +145,10 @@ joystick to nudge the view up or down in small steps.
             speedFactor = 1f;
             delta = (stickLook.y * 90f - stickViewAngle);
         }
-        delta *= deltaTime*Settings.verticalReadjustSpeed*speedFactor;
+        delta *= deltaTime * 4f * speedFactor;
         stickViewAngle += delta;
         rotateView(stickLook.x * deltaTime * Settings.turnSpeed*speedFactor,  delta );
 ```
 
-This concludes step 16 which added game controller support to the game.
+
+This concludes step 16 which added basic game controller support to the game.
