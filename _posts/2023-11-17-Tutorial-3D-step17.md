@@ -14,8 +14,6 @@ GameView:
 
 ```java
     public void render(float delta, float speed ) {
-        if(!isOverlay)
-            camController.update(world.getPlayer().getPosition(), world.getPlayerController().getViewingDirection());
         addHeadBob(delta, speed);
         cam.update();
         ...
@@ -23,7 +21,7 @@ GameView:
 
     private void addHeadBob(float deltaTime, float speed ) {
         if( speed > 0.1f ) {
-            bobAngle += speed * deltaTime * Math.PI / Settings.headBobDuration;
+            bobAngle += speed * deltaTime * 0.5f * (float)Math.PI / Settings.headBobDuration;
             // move the head up and down in a sine wave
             cam.position.y +=  bobScale *  Settings.headBobHeight * (float)Math.sin(bobAngle);
         }
@@ -42,7 +40,7 @@ GameScreen:
         ...
         world.update(delta);
 
-        float moveSpeed = world.getPlayer().body.getVelocity().len();
+        float moveSpeed = world.player.body.getVelocity().len();
         gameView.render(delta, moveSpeed);
         if(debugRender) {
             gridView.render(gameView.getCamera());
@@ -62,6 +60,8 @@ of the rigid body to a Vector3.
 PhysicsBody:
 
 ```java
+    private final Vector3 linearVelocity = new Vector3();
+
     public Vector3 getVelocity() {
         DVector3C v = geom.getBody().getLinearVel();
         linearVelocity.set((float)v.get0(), (float)v.get1(), (float)v.get2());
