@@ -63,8 +63,12 @@ PhysicsBody:
     private final Vector3 linearVelocity = new Vector3();
 
     public Vector3 getVelocity() {
-        DVector3C v = geom.getBody().getLinearVel();
-        linearVelocity.set((float)v.get0(), (float)v.get1(), (float)v.get2());
+        DBody rigidBody = geom.getBody();
+        if(rigidBody != null) {
+            DVector3C v = geom.getBody().getLinearVel();
+            linearVelocity.set((float) v.get0(), (float) v.get1(), (float) v.get2());
+        } else
+            linearVelocity.set(Vector3.Zero);
         return linearVelocity;
     }
 ```
