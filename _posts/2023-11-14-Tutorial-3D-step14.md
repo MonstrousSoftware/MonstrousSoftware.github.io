@@ -53,22 +53,34 @@ when the gun is fired.
         }
 ```
 
+Add a new asset to the `Assets` class:
+```java
+    public Texture scopeImage;
+```
+Add it to the assets to be loaded in the `Assets` constructor:
+```java
+        assets.load("images/scope.png", Texture.class);
+```
+
+And after loading assign it to the class member in `initConstants`:
+```java
+        scopeImage = assets.get("images/scope.png");
+```
+
 Add a boolean to the class WeaponState, this will indicate if we are looking through the scope or not:
 
 ```java
         public boolean scopeMode;
 ```
 
-In PlayerController set the scope mode if the right button mouse is down.  If the mouse is moved with a button held down the `touchDragged()` method will be called.
-Use this to move the view direction, like in `mouseMoved()`, but more slowly than in normal mode (20% of normal mouse speed).
+In PlayerController set the scope mode if the right button mouse is down by adding some lines to `touchDown`. Add a method `touchUp` to leave the scope mode
+if the right button mouse is released.  Add a method `touchDragged` which is called if the mouse is moved with a button held down.
+Use this method to move the view direction exactly like in `mouseMoved()` but more slowly (20% of normal mouse speed).
 
 ```java
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-            if(button == Input.Buttons.LEFT) {
-                world.rayCaster.findTarget(world.getPlayer().getPosition(), viewingDirection, hitPoint);
-                world.fireWeapon(  viewingDirection, hitPoint );
-            }
+            //...
             if(button == Input.Buttons.RIGHT )
                 world.weaponState.scopeMode = true;          // enter scope mode with RMB
             return false;
@@ -158,4 +170,4 @@ The method to set the field of view in the GameView class is very simple:
         }
 ```
 
-This concludes step 14, allowing us to go into "sniper mode".
+This concludes step 14, allowing us to dispatch the bad guys in "sniper mode".
