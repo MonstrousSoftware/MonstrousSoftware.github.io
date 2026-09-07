@@ -4,7 +4,7 @@ by Monstrous Software
 
 # Step 17 - Head Bobbing
 
-Somewhere along the way we lost the head bobbing effect that we added in step 2 of this tutorial.
+When we moved from the original player controller to a physics based player controller, we lost the head bobbing effect that we added in step 2 of this tutorial.
 Let us reintroduce this.  We add a method to the GameView class that calculates a bob height value which gets
 added to the camera height in the render method.  The bob height value is calculated with a sine function.
 If the player speed is close to zero the effect is disabled to avoid head bobbing when the player is standing
