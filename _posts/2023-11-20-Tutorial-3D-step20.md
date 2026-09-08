@@ -37,23 +37,8 @@ Lwjgl3Launcher.java:
 Although in many places, we already used deltaTime to make game behaviour independent of frame rate, there were in fact still a few places
 where it was not done properly.
 
-We notice the enemies are moving much too fast. Where we are applying force to the enemy rigid bodies, we need to scale this with the time step.
-Change as follows (you could also change `Settings.cookForce` to get rid of this 60f constant) :
-
-CookBehaviour.java:
-
-```java
-  @Override
-    public void update(World world, float deltaTime ) {
-        ...
-
-            if(distance > 5f)   // move unless quite close
-                go.body.applyForce(targetDirection.scl(deltaTime * 60f * Settings.cookForce * climbFactor));
-        }
-```
-
-Then some changes are needed to the PlayerController, because the jumps are too high and the view rotation with the mouse is too slow.
-The jump force also needs to be scaled with deltaTime.  The mouse movement was scaled by deltaTime but in fact it shouldn't be. The amount
+Some changes are needed to the PlayerController, the view rotation with the mouse is too slow.
+The mouse movement was scaled by deltaTime but in fact it shouldn't be. The amount
 of rotation is directly determined by how much the mouse has moved.
 
 
@@ -64,10 +49,10 @@ PlayerController:
         ...
 
         // mouse to move view direction
-        rotateView(mouseDeltaX*Settings.turnSpeed/60f, mouseDeltaY*Settings.turnSpeed/60f ); <---- removed deltaTime
+        rotateView(mouseDeltaX*Settings.turnSpeed/60f, mouseDeltaY*Settings.turnSpeed/60f );    //<--- removed deltaTime
         mouseDeltaX = 0;
         mouseDeltaY = 0;
-
+    
         // controller stick inputs
         moveForward(stickMove.y*deltaTime * moveSpeed);
         strafe(stickMove.x * deltaTime * Settings.walkSpeed);
@@ -81,10 +66,10 @@ PlayerController:
             speedFactor = 1f;
             delta = (stickLook.y * 90f - stickViewAngle);
         }
-        delta *= deltaTime*Settings.verticalReadjustSpeed*speedFactor;
+        delta *= deltaTime*4f*speedFactor;
         stickViewAngle += delta;
         rotateView(stickLook.x * deltaTime * Settings.turnSpeed*speedFactor,  delta );
-
+        
         // note: most of the following is only valid when on ground, but we leave it to allow some fun cheating
         if (keys.containsKey(forwardKey))
             moveForward(deltaTime * moveSpeed);
@@ -98,45 +83,46 @@ PlayerController:
             rotateView(deltaTime * Settings.turnSpeed, 0);
         if (keys.containsKey(turnRightKey))
             rotateView(-deltaTime * Settings.turnSpeed, 0);
-
+    
         if (isOnGround && keys.containsKey(jumpKey) )
-            linearForce.y =  Settings.jumpForce * deltaTime * 60f;              <---- change
-
-        linearForce.scl(120);
+            linearForce.y =  deltaTime * Settings.jumpForce;
+    
+        linearForce.scl(500);
         player.body.applyForce(linearForce);
         // note: as the player body is a capsule it is not necessary to rotate it
         // (and in fact it causes problems due to errors building up)
         // so we don't rotate the rigid body, but we rotate the modelInstance in World.syncToPhysics()
     }
+
 ```
 
-Then in GameView the `render()` method needs a small update.  This is to make sure that when the game view is used for an overlay (i.e. the gun view), the camera is reset
+Then in GameView the `render()` method needs a small update.  This is to make sure that the game view that is used for an overlay (i.e. the gun view), the camera is reset
 to the same Y position each frame before adding the bobbing effect.  Otherwise, the gun will just drift away.  It is an effect that only becomes noticeable with very small
 deltaTime values.
 
 ```java
-    public void render(float delta, float speed ) {
-        if(!isOverlay)
-            camController.update(world.getPlayer().getPosition(), world.getPlayerController().getViewingDirection());
-        else                                                    <-----   add
-            cam.position.y = Settings.eyeHeight;                <------- add
-        addHeadBob(delta, speed);
-        cam.update();
-        refresh();
-        sceneManager.update(delta);
+    @Override
+    public void render(float delta) {
+            //...
 
-        Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);   // clear depth buffer only
-        sceneManager.render();
+            if(!thirdPersonView && world.weaponState.currentWeaponType == WeaponType.GUN &&!lookThroughScope) {
+                gunView.getCamera().position.y = Settings.eyeHeight;    // reset camera height
+                gunView.render(delta, moveSpeed);
+            }
+            //...
     }
+```
 
-    private void addHeadBob(float deltaTime, float speed ) {
-        if( speed > 0.1f ) {
-        bobAngle += speed * deltaTime * Math.PI / Settings.headBobDuration;
+As the gun's bobbing motion is now barely visible, adjust the scale of it when creating the gun view in `GameScreen#show`:
 
-        // move the head up and down in a sine wave
-        cam.position.y +=  bobScale * Settings.headBobHeight * (float)Math.sin(bobAngle);
-        }
-    }
+```java
+    @Override
+    public void show() {
+        //...
+    
+        // create an overlay view and add gun model
+        gunView = new GameView(gunWorld, true, 0.01f, 10f, 1.0f); //last param (bobScale) was 0.1f
+    }   
 ```
 
 These are the steps needed to have the game run the same, regardless of which frame rate you are using, so that different users get the same experience.
