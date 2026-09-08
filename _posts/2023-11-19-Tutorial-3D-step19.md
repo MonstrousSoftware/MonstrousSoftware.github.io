@@ -816,7 +816,7 @@ in the direction of the way point.
                 direction.slerp(targetDirection, 0.02f);            // smooth rotation towards target direction
     
                 if (distance > 5f)   // move unless quite close
-                    go.body.applyForce(targetDirection.scl(Settings.cookForce * climbFactor));
+                    go.body.applyForce(targetDirection.scl(deltaTime * 60f * Settings.cookForce * climbFactor));
             }
 
             // every so often shoot a pan
