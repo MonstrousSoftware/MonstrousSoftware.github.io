@@ -15,7 +15,7 @@ ODE on the other hand has been fully translated to Java in the ODE4j project, an
 for example because it makes use of multi-threading.  There was a derivation called gdx-ode4j by AntzGames which worked on the web version
 but this is no longer maintained.
 
-This means we will continue this tutorial focusing on the desktop version only. If you try to build the web version, you will get many errors.
+This means we will continue the rest of this tutorial only for the desktop version. If you try to build the web version, you will get many errors.
 
 The manual for ODE can be found at [ode.org](https://ode.org/wiki/index.php/Manual).
 
