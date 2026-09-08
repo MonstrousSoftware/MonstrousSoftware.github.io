@@ -13,14 +13,14 @@ There exist tools that can generate a navigation mesh automatically.  A well-kno
 JamesTKhan has developed a library called [gdx-recast](https://github.com/JamesTKhan/gdx-recast) for gdx to work with Recastj, which is a java port of Recast.
 
 However, there is also another, perhaps easier, way to build your navmesh through an on-line version of Recast which can be found here [https://navmesh.isaacmason.com/](https://navmesh.isaacmason.com/).
-You can drag and drop your game level as a glTF file and it can export a navmesh as another glTF file.
+You can drag and drop your game level as a glTF file, and it can export a navmesh as another glTF file.
 
 This is very handy if we can assume your game level is static so that we can build the nav mesh ahead of time.
 
 First we will prepare a glTF file as input from the original Blender file (step21.blend)
 
 It helps to distinguish between static objects which we consider to be part of the game level (walls, ramps, the ground, etc.) and dynamic objects which will be moving or be scattered around the level (characters, coins, health packs, etc.).
-For this we create two "collections" in Blender's outliner one called Static and one called Dynamic and we drag each object into one of these collections.
+For this we create two "collections" in Blender's outliner one called Static and one called Dynamic, and we drag each object into one of these collections.
 
 ![Blender collections](/assets/images/blender-grouping.png)
 
@@ -47,7 +47,7 @@ The only problem remaining is a little island that appears under the slope. We w
 
 ![island](/assets/images/isaacmason3.png)
 
-Now you can use the "Export at GLTF" button to download the generated navmesh. Save it somewhere and then import it into the Blender file (File/Import/glTF 2.0).  Rename the imported object from "Mesh-01" to "NAVMESH" because that is what our game will be looking for.
+Now you can use the "Export as GLTF" button to download the generated navmesh. Save it somewhere and then import it into the Blender file (File/Import/glTF 2.0).  Rename the imported object from "Mesh-01" to "NAVMESH" because that is what our game will be looking for.
 
 In Blender we have to get rid of that island under the slope. Hide all other objects (Select and press H). Select NAVMESH and go to Edit mode (Tab) and be sure to be in face mode (press 3).  Select all faces belonging to islands (e.g. by pressing L to select the face under the mouse pointer) and delete them.
 It is very important that there are no unreachable islands in the navmesh.

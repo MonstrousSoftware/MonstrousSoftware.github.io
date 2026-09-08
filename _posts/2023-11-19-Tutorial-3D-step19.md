@@ -414,11 +414,11 @@ we assume that the enemy will be strictly following this given path.
 
 
 To visualize what is happening we can create a view class to render the nodes of the navmesh and give each node a colour depending on its step value.
-This uses MeshBuilder to create a render model every time `update()` is called. This is a relatively expensive operation, but it is only used in debug view
+This uses MeshBuilder to create a render model every time `update()` is called. This is a relatively expensive operation, but it is only used in debug view (we will toggle this view with the F3 key)
 and it doesn't seem to affect frame rate too badly in practice.
 
 By calling `update()` and `render()` in the main render loop, after the game world itself has been rendered we can see the navmesh triangles, with the distance to the player
-shaded from red to blue. As the player runs around we can see that the colours adapt.
+shaded from red to blue. As the player runs around we can see that the colours adapt.  It is easiest to see in third person view (press F2) because then you can zoom out better.
 
 This is also a good moment to check the whole nav mesh is continuous, i.e. all the corners are reached.  
 If there are issues of connectivity between nodes (a poorly constructed nav mesh), you could have multiple "islands" which appear not connected and 
