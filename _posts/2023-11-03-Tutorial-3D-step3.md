@@ -34,7 +34,7 @@ We'll need a lot of new fields in the GameScreen class:
 In the show() method add the following code to create a SceneManager and to add the contents from a glTF file to the SceneManager. 
 ```java
         sceneManager = new SceneManager();
-        sceneAsset = new glTFLoader().load(Gdx.files.internal("models/step3.gltf"));
+        sceneAsset = new GLTFLoader().load(Gdx.files.internal("models/step3.gltf"));
         Scene scene = new Scene(sceneAsset.scene);
         sceneManager.addScene(scene);
 ```
