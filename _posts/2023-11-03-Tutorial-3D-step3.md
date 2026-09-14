@@ -13,7 +13,8 @@ We use the gdx-gtlf extension to support import of this file format and to suppo
 
 ## gdx-gtlf
 
-We will use the quick start example of the gdx-gltf project as example. You can find it here [GLTFQuickStartExample.java](https://github.com/mgsx-dev/gdx-gltf/blob/master/demo/core/src/net/mgsx/gltf/examples/glTFQuickStartExample.java).
+We will use the quick start example of the gdx-gltf project as example. You can find it here [GLTFQuickStartExample.java](https://github.com/mgsx-dev/gdx-gltf/blob/master/demo/core/src/net/mgsx/gltf/examples/GLTFQuickStartExample.java).
+
 
 The gdx-gltf extension introduces the SceneManager class.  This holds the camera, the rendering environment (lights, fog, etcetera) and all the objects to be rendered (called scenes).   We will add the objects (scenes) to the SceneManager using addScene() and call SceneManager.render() at each frame to display them on the screen.
 You can think of a Scene as equivalent to the ModelInstance we saw earlier.  It corresponds to one instance of a mesh at a specific position and with some specific orientation.
